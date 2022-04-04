@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>COMP3005</title>
+<style>
+body {
+	font-family: Arial, Helvetica, sans-serif;	
+	margin-left:80px;
+	margin-right:80px;
+}
+h1, h2, h3 {
+	font-weight: bold;
+	color: blue;
+}
+p {
+	font-size: large;
+}
+pre {
+	font-size: 14pt;
+}
+
+.red {
+	color: #F00;
+}
+.green {
+	color: forestgreen;
+}
+  .bold {
+	font-weight: bold;
+}
+.requirement {
+	font-weight: bold;
+	background-color: #6AF37A;
+}
+.requirement_danger {
+	font-weight: bold;
+	background-color: #F47272
+}
+.requirement_warning {
+	font-weight: bold;
+	background-color: #F6CA54
+}
+  .code {
+	font-family: "Courier New", Courier, monospace;
+}
+  .requirement_warning1 {	font-weight: bold;
+	background-color: #F7BD36
+}
+</style>
+</head>
+<body class="arial">
+<h1>COMP 3005 Winter 2022 Term Project Assignment (Assign 6)</h1>
+<h1><span class="red">Due: Tue. Apr. 12 by 10:00pm (submitted to</span> <a href="https://brightspace.carleton.ca">brightspace</a><span class="red">)</span> </h1>
+<p class="red">
+All assignments
+  must be submitted using <a href="https://brightspace.carleton.ca">brightspace</a> by the due data and time. No other assignments will be accepted or
+marked. </p>
+<p class="red">&nbsp;</p>
+<p class="red">Revisions:</p>
+<p class="auto-style7">Rev 2 (2022 02 12) made explicit the requirement that your YouTube demonstration videos cannot be longer than 10 minutes.</p>
+<p class="auto-style7">Rev 1 (2022 01 24) Added a critical intent requirement that states you cannot use ORM Wrappers that hide all the SQL in your project.</p>
+<hr>
+<p>&nbsp;</p>
+<p><span class="badge-danger">Marking:</span> This assignment 
+  is based on <span class="badge-danger">13 </span>design requirements numbered <span class="badge-success"><span class="requirement">R1.1</span></span>...<span class="badge-success"><span class="requirement">R3.4</span></span> for a total of <span class="red">26</span> marks. </p>
+<p>Marks are awarded, or deducted, based on requirements as follows:</p>
+<table border="1">
+  <tr>
+    <th width="83">Req Type</th>
+    <th width="716">Assignment Grading</th>
+  </tr>
+  <tr>
+    <td><span class="requirement_danger">R0.x</span></td>
+    <td><p><span class="requirement_danger">Critical Submission and Intent Requirements.</span> Assignment (or problem in some cases) gets 0 if <span class="bold">any</span> critical submission requirement (shown in red) is not met.<br>
+    </p></td>
+  </tr>
+  <tr>
+    <td><span class="requirement_warning">R0.x</span></td>
+    <td><p><span class="requirement_warning">Good Practice Requirements.</span> You lose 2 marks for any good practice <br>
+      requirement (shown in amber) not met.<br>
+    </p></td>
+  </tr>
+  <tr>
+    <td><span class="requirement">Rx.x</span></td>
+    <td><p><span class="requirement">Design Requirements.</span> You earn 2 marks for each design requirement (green) satisfied, well implemented, and demonstrated as requested; 1 mark if it's partly met, met but not well implemented, or met but not demonstrated; and 0 if it's not attempted or met.</p></td>
+  </tr>
+</table>
+<p class="red">&nbsp;</p>
+<h2 class = "red">Submission (what to submit):</h2>
+<table border="1" class="code">
+  <tr>
+    <th width="226">Question</th>
+    <th width="641">Devliverable to Submit</th>
+  </tr>
+<tr>
+    <td>Part 1</td>
+    <td>Single .pdf document containing a final one page description of your project database and a final ER diagram.</td>
+ </tr>
+<tr>
+    <td>Part 2</td>
+    <td>The code for your project which consists of the sqlite3 database file and the user interface code that accesses it.</td>
+ </tr>
+  <tr>
+    <td>Part 3</td>
+    <td><p>a link to your YouTube video with sound demonstrating your database. Provide the link in the readme.txt included with your submission.<br>
+      </p></td>
+  </tr>
+  
+</table><p>&nbsp;</p>
+<hr><br>
+<h2>Project SQLite Database Demonstration</h2>
+<p>COMP 3005 winter 2022 has a project assignment worth 15% of the course grade. Some of the parts you will have worked on in the previous assignments and can be duplicated here if unchanged. You are required to design and implement your project database as an sqlite3 database, access it through a browser, or some other user interface you create and demonstrate it by posting a YouTube screen capture video with sound (narration). </p>
+<p>In this assignment you will provide us with your completed project database that you started in the previous course assignments. You need to provide a final description with ER model, the sqlite3 database and user-inferface code, and demonstrate some important queries that your database was designed to support.</p>
+<p>To get full marks for this assignment we want you to access your sqlite3 database through some kind of user interface that you created for your application. This could be accessing it with a web browser, a java desktop app, or an Android or IOS mobile app. Python wrappers for sqlite aslo seem very popular. It is up to you how you want to this. (Note that about 6 out of the 26 marks are for having the custom interface. If you choose to just use the sqlite3 console app or some other generic client you can get a max of 20/26 marks.)</p>
+<h2>&nbsp;</h2>
+<h2>Part 1: Final Database Description.</h2>
+<p>Provide a final description and ER model of your database and walk us through it in your demonstration video. Specifically: </p>
+<p><span class="requirement">R1.1</span> <span class="red">[2 mark (0 not done, 1 partly OK, 2 All good)]</span> Provide a one page english description of your database and its intended use. Your description should provide enough detail to make it easy to read and understand you ER Model.</p>
+<p><span class="requirement">R1.2</span> <span class="red">[2 marks]</span> Provide an ER model for your final database.</p>
+<p><span class="requirement">R1.3</span> <span class="red">[2 marks]</span> Your ER model should show all primary keys, descriminators, and indicate the cardinality (1:1, 1:N, N:N) of all relationships.</p>
+<p><span class="requirement">R1.4</span> <span class="red">[2 marks]</span> Your ER model should have at least three entities and at least two N:N relationships. This is the minimum complexity requirement for the project database.</p>
+<p>&nbsp;</p>
+<hr>
+<h2>Part 2: Your SQLite Database and User Interface</h2>
+<p>Provide an sqlite3 database containing all your data and whatever user inferface code you are using to access it. You will demonstrate it on our YouTube video by performing a least two of the main query use-cases that you database was primarily designed for.</p>
+<p>&nbsp;</p>
+<p><span class="requirement_danger">Intent Requirement R0.0</span> <span class="red">You must use an sqlite3 database for this project. Other databases will not be accepted.</span></p>
+<p><span class="requirement_danger">Intent Requirement R0.1</span> <span class="red">Your sqlite code wrapper must still involve you using SQL within it. You cannot use an ORM (Object Relational Mapper) wrapper that essentially removes all SQL and completely hides the existance of an SQL database. We must able to see in your code how your querries were fomulated as SQL and executed against the database.</span></p>
+<p><span class="requirement_danger">0 marks for this assignment  if any intent requirement is not met.</span></p>
+<p>&nbsp;</p>
+<p><span class="requirement">R 2.1</span> <span class="red">[2 marks]</span> Your submission must contain a readme.txt file. This file should tell us the filename and folder location of your sqlite3 database. We should be able to open that file with the sqlite3 command line tool and manually examine your database. Note you are supplying the actual database file NOT and SQL script - you don't need to submit the SQL script file that generates the database.</p>
+<p><span class="requirement">R 2.2</span> <span class="red">[2 marks]</span> Your project should wrap the database in a user interface or web-page designed for your application. It should have some custom labels or titles that reflect the meaining of output or input fields. That is, your project database should not just use the sqlite3 command line interface or some generic sqlite client.</p>
+<p><span class="requirement">R 2.3</span> <span class="red">[2 marks]</span> The table schema of your created database should match that of your ER model. That is, the schema should be a direct mapping and use similar (but not necessarily identical) column names as attribue names. In short, it should be easy to follow your schema after reading your ER diagram.</p>
+<p>&nbsp;</p>
+<hr>
+<p>&nbsp;</p>
+<h2>Part 3: YouTube Demonstration Of Your Project</h2>
+<p>Provide a link to a YouTube video demonstration of you database project subject to the following requirements..</p>
+<p><span class="requirement_danger">Intent Requirement R0.2</span> <span class="red"> You must provide a link to a YouTube demonstation video that we can actually watch (that is &quot;unlisted&quot;). If we cannot watch your video because the link is not valid or the video is &quot;private&quot; then no marks will be awarded for the Part 3 requirements.</span></p>
+<p><span class="requirement_danger">0 marks for Part 3 if there is no viewable YouTube video link.</span></p>
+<p><span class="requirement_danger">Video Length Requirement R0.3</span> <span class="red"> Your YouTube demonstation video must not be more than 10 minutes long. I will only require the TA's to watch the first 10 minutes. If your video is actually longer make sure to demonstrate the essential requirements within the first 10 minutes.</span></p>
+<p>&nbsp;</p>
+<p><span class="requirement">R3.1</span> <span class="red">[2 marks]</span> On your demonstration video should introduce yourself and give a brief description of your database project and its intent. The total duration of your project video must  not be more than 10 minutes.</p>
+<p><span class="requirement">R3.2</span> <span class="red">[2 marks]</span> Your demonstration should start with a short (one minute) walkthrough of your ER diagram. Provide enough details for us to be able to understand the main tables and columns of you database.</p>
+<p><span class="requirement">R3.3</span> <span class="red">[2 marks]</span> Demonstrate one of the primary use-case queries of your database application. The query should be performed through whatever user-interface you have created. <span class="red">(Maximum of 1 mark if the demonstration just uses the sqlite3 command-line interface or other generic sqlite3 interface).</span></p>
+<p><span class="requirement">R3.4</span> <span class="red">[2 marks]</span> Demonstrate a second important use-case query of your database application. The query should be performed through whatever user-interface you have created. <span class="red">(Maximum of 1 mark if the demonstration just uses the sqlite3 command-line interface  or other generic sqlite3 interface).</span></p>
+<p><span class="requirement">R3.5</span> <span class="red">[2 marks]</span> Demonstrate a query that involves an N:N relationship in your data. <span class="red">(Maximum of 1 mark if the demonstration just uses the sqlite3 command-line interface  or other generic sqlite3 interface).</span></p>
+<p><span class="requirement">R3.6</span> <span class="red">[2 marks]</span> Demonstrate a query that involves a secondary refinement, or query based on the results of the first query. For example you might do query that lists all the hip-hop CD's in a collection and if you click on one of the CD's it shows all the songs on that CD. <span class="red">(Maximum of 1 mark if the demonstration just uses the sqlite3 command-line interface  or other generic sqlite3 interface).</span></p>
+<p>&nbsp;</p>
+<p></p>
+<hr>
+<p>&nbsp;</p>
+<h2>&nbsp;</h2>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+</body>
+</html>
