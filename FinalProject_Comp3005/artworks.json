@@ -66,5 +66,46 @@
         "https://americanart.si.edu/artwork/long-island-homestead-study-nature-26788",
         "https://americanart.si.edu/artwork/miss-liberty-celebration-15517",
         "https://americanart.si.edu/artwork/death-ruben-salazar-33584"
+    ],
+    "MoMa":[
+        "https://www.moma.org/collection/works/205998?classifications=9&date_begin=1850&date_end=2022&direction=fwd&on_view=1&page=2&q=&utf8=%E2%9C%93&with_images=1", 
+        "https://www.moma.org/collection/works/98673?classifications=9&date_begin=1850&date_end=2022&direction=fwd&on_view=1&page=2&q=&utf8=%E2%9C%93&with_images=1", 
+        "https://www.moma.org/collection/works/205989?classifications=9&date_begin=1850&date_end=2022&direction=fwd&on_view=1&page=2&q=&utf8=%E2%9C%93&with_images=1", 
+        "https://www.moma.org/collection/works/79234?classifications=9&date_begin=1850&date_end=2022&direction=fwd&on_view=1&page=2&q=&utf8=%E2%9C%93&with_images=1", 
+        "https://www.moma.org/collection/works/205999?classifications=9&date_begin=1850&date_end=2022&direction=fwd&on_view=1&page=2&q=&utf8=%E2%9C%93&with_images=1", 
+        "https://www.moma.org/collection/works/79961?classifications=9&date_begin=1850&date_end=2022&direction=fwd&on_view=1&page=2&q=&utf8=%E2%9C%93&with_images=1", 
+        "https://www.moma.org/collection/works/393384?classifications=9&date_begin=1850&date_end=2022&direction=fwd&on_view=1&page=2&q=&utf8=%E2%9C%93&with_images=1", 
+        "https://www.moma.org/collection/works/222282?classifications=9&date_begin=1850&date_end=2022&direction=fwd&on_view=1&page=2&q=&utf8=%E2%9C%93&with_images=1", 
+        "https://www.moma.org/collection/works/79810?classifications=9&date_begin=1850&date_end=2022&direction=fwd&on_view=1&page=2&q=&utf8=%E2%9C%93&with_images=1", 
+        "https://www.moma.org/collection/works/101471?classifications=9&date_begin=1850&date_end=2022&direction=fwd&on_view=1&page=2&q=&utf8=%E2%9C%93&with_images=1", 
+        "https://www.moma.org/collection/works/79462?classifications=9&date_begin=1850&date_end=2022&direction=fwd&on_view=1&page=2&q=&utf8=%E2%9C%93&with_images=1", 
+        "https://www.moma.org/collection/works/80528?classifications=9&date_begin=1850&date_end=2022&direction=fwd&on_view=1&page=2&q=&utf8=%E2%9C%93&with_images=1", 
+        "https://www.moma.org/collection/works/79250?classifications=9&date_begin=1850&date_end=2022&direction=fwd&on_view=1&page=2&q=&utf8=%E2%9C%93&with_images=1", 
+        "https://www.moma.org/collection/works/79251?classifications=9&date_begin=1850&date_end=2022&direction=fwd&on_view=1&page=2&q=&utf8=%E2%9C%93&with_images=1", 
+        "https://www.moma.org/collection/works/280438?classifications=9&date_begin=1850&date_end=2022&direction=fwd&on_view=1&page=2&q=&utf8=%E2%9C%93&with_images=1", 
+        "https://www.moma.org/collection/works/82211?classifications=9&date_begin=1850&date_end=2022&direction=fwd&on_view=1&page=2&q=&utf8=%E2%9C%93&with_images=1", 
+        "https://www.moma.org/collection/works/78386?classifications=9&date_begin=1850&date_end=2022&direction=fwd&on_view=1&page=2&q=&utf8=%E2%9C%93&with_images=1", 
+        "https://www.moma.org/collection/works/80269?classifications=9&date_begin=1850&date_end=2022&direction=fwd&on_view=1&page=2&q=&utf8=%E2%9C%93&with_images=1", 
+        "https://www.moma.org/collection/works/78594?classifications=9&date_begin=1850&date_end=2022&direction=fwd&on_view=1&page=2&q=&utf8=%E2%9C%93&with_images=1", 
+        "https://www.moma.org/collection/works/80566?classifications=9&date_begin=1850&date_end=2022&direction=fwd&on_view=1&page=2&q=&utf8=%E2%9C%93&with_images=1" 
+    ],
+
+    "NGC":[
+        "https://www.nga.gov/collection/art-object-page.71072.html",
+        "https://www.gallery.ca/collection/artwork/balling",
+        "https://www.gallery.ca/collection/artwork/rock-needle-seen-through-the-porte-daval-etretat",
+        "https://www.gallery.ca/collection/artwork/perspective",
+        "https://www.gallery.ca/collection/artwork/quebec-from-the-citadel",
+        "https://www.gallery.ca/collection/artwork/beach-pools-at-night",
+        "https://www.gallery.ca/collection/artwork/frank-sinatra-new-york",
+        "https://www.gallery.ca/collection/artwork/untitled-5076",
+        "https://www.gallery.ca/collection/artwork/veriditas",
+        "https://www.gallery.ca/collection/artwork/gathering-0",
+        "https://www.gallery.ca/collection/artwork/boy-in-red-shirt",
+        "https://www.gallery.ca/collection/artwork/martha-graham-war-theme",
+        "https://www.gallery.ca/collection/artwork/fontainebleau",
+        "https://www.gallery.ca/collection/artwork/reclining-nude-3",
+        "https://www.gallery.ca/collection/artwork/a-church",
+        "https://www.gallery.ca/collection/artwork/underpass-montreal"
     ]
 }
