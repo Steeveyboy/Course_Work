@@ -1,26 +1,55 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Hello Bulma!</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
-  </head>
-  <body>
-  <section class="section">
-    <div class="container">
-      <h1 class="title">
-        {{Artwork.Title}}
-      </h1>
-      <p class="">
-        <strong>{{Artwork.Artist}}</strong>
-
-      </p>
-      <img src={{Artwork.Image_Address}} alt="">
-      <p>{{Artwork.Year}}</p>
-      <p>{{Artwork.Gallery}}</p>
-      <p>{{Artwork.Collection}}</p>
-    </div>
-  </section>
-  </body>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+        <title>Home</title>
+        <style>
+            .header{
+              text-align: center;
+            }
+            .container{
+                text-align: center;
+                margin-top: 1rem;
+            }
+            .searchForm{
+                display: inline;
+            }
+            .searchBar{
+                font-size: 1em;
+                height: 2.5em;
+                border-radius: 4px;
+                width: 80%;
+                max-width: 50rem;
+            }
+            button{
+                display: inline-block;
+            }
+            .search{
+                text-align: center;
+            }
+          </style>
+    </head>
+    <body>
+        <section class="section">
+            <div class="header">
+            <a href="/">Home</a>
+            <a href="/random">Random</a>
+            </div>
+            <br>
+            <div class="search">
+                <form class="searchForm" method="post" action="">
+                    <input class="searchBar" type="text" name="searchText" placeholder="Search by Artpiece, Gallery, or Patron">
+                    <button class="button is-info" type="submit" formaction="searchArt">Search Piece</button>
+                    <button class="button is-info" type="submit" formaction="searchGallery">Search Gallery</button>
+                </form>
+            </div>
+            <div class="searchResults">
+                {% for result in results.list %}
+                    <li><a href="/{{ results.page }}/{{ result[0] }}">{{ result[0] }}</a></li>
+                {% endfor %}
+            </div>
+        </section>
+    </body>
 </html>

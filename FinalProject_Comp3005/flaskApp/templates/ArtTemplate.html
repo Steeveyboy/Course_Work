@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Art Database</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <style>
+      .header{
+        text-align: center;
+      }
+      .container{
+        text-align: center;
+        margin-top: 1rem;
+      }
+      #mainImage{
+        max-width: 45vw;
+      }
+      .details{
+        margin-left: auto;
+        margin-right: auto;
+      }
+    </style>
+  </head>
+  <body>
+  <section class="section">
+    <div class="header">
+      <a href="/">Home</a>
+      <a href="/random">Random</a>
+    </div>
+    <div class="container">
+      <h1 class="title">
+        {{results["Artwork"].Title}}
+      </h1>
+
+      <img src="{{ results['Artwork'].Image_Address}}" alt="" id="mainImage">
+      <br>
+      <br>
+        <table class="details">
+          <tr>
+            <th>Artist: </th>
+            <td><p class=""><strong>{{results['Artwork'].Artist}}</strong></p></td>
+          </tr>
+          <tr>
+            <th>Date</th>
+            <td><p>{{results['Artwork'].Year}}</p></td>
+          </tr>
+          <tr>
+            <th>Gallery:</th>
+            <td><p>{{results['Artwork'].Gallery}}</p></td>
+          </tr>
+          <tr>
+            <th>Collection:</th>
+            <td><p>{{results['Artwork'].Collection}}</p></td>
+          </tr>
+      </table>
+      <br>
+      <div class="ownersBox">
+        <h3><u>Owners</u></h3>
+        {% for owner in results.owners %}
+          <li>
+            <a href="/user/{{ owner[3] }}">{{ owner[1] }} {{ owner[2] }}</a>
+          </li>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  </body>
+</html>

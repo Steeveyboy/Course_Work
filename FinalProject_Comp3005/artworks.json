@@ -50,22 +50,6 @@
         "https://americanart.si.edu/artwork/buffalo-grain-elevators-5948",
         "https://americanart.si.edu/artwork/employment-of-negroes-in-agriculture-20876",
         "https://americanart.si.edu/artwork/visit-prince-wales-president-buchanan-and-dignitaries-tomb-washington-mount-vernon-october",
-        "https://americanart.si.edu/artwork/magnolia-blossoms-12771",
-        "https://americanart.si.edu/artwork/interlude-13569",
-        "https://americanart.si.edu/artwork/frank-ohara-1926-1966-10010",
-        "https://americanart.si.edu/artwork/untitled-individual-element-healing-machine-110747",
-        "https://americanart.si.edu/artwork/thundershower-21723",
-        "https://americanart.si.edu/artwork/distant-view-mandan-village-4030",
-        "https://americanart.si.edu/artwork/wi-jun-jon-pigeons-egg-head-light-going-and-returning-washington-4317",
-        "https://americanart.si.edu/artwork/elizabeth-winthrop-chanler-mrs-john-jay-chapman-21621",
-        "https://americanart.si.edu/artwork/untitled-figure-white-eyebrows-110524",
-        "https://americanart.si.edu/artwork/callers-24394",
-        "https://americanart.si.edu/artwork/black-knife-apache-warrior-22852",
-        "https://americanart.si.edu/artwork/travelling-carnival-santa-fe-22505",
-        "https://americanart.si.edu/artwork/hindu-merchants-27286",
-        "https://americanart.si.edu/artwork/long-island-homestead-study-nature-26788",
-        "https://americanart.si.edu/artwork/miss-liberty-celebration-15517",
-        "https://americanart.si.edu/artwork/death-ruben-salazar-33584"
     ],
     "MoMa":[
         "https://www.moma.org/collection/works/205998?classifications=9&date_begin=1850&date_end=2022&direction=fwd&on_view=1&page=2&q=&utf8=%E2%9C%93&with_images=1", 
@@ -90,8 +74,10 @@
         "https://www.moma.org/collection/works/80566?classifications=9&date_begin=1850&date_end=2022&direction=fwd&on_view=1&page=2&q=&utf8=%E2%9C%93&with_images=1" 
     ],
 
+    "NGA":[
+        "https://www.nga.gov/collection/art-object-page.71072.html"
+    ],
     "NGC":[
-        "https://www.nga.gov/collection/art-object-page.71072.html",
         "https://www.gallery.ca/collection/artwork/balling",
         "https://www.gallery.ca/collection/artwork/rock-needle-seen-through-the-porte-daval-etretat",
         "https://www.gallery.ca/collection/artwork/perspective",

@@ -1,0 +1,54 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            text-align: center;
+        }
+        .header{
+            text-align: center;
+        }
+        .artBox{
+            margin-bottom: 1rem;
+        }
+        .artBox a{
+            display: inline;
+            position:relative;
+        }
+        li p{
+            display: inline-block;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="/">Home</a>
+        <a href="/random">Random</a>
+    </div>
+    <section class="section"></section>
+        <h1>{{ results[0][4] }} {{ results[0][5] }}</h1>
+        <h3>Patron ID: {{ results[0][1] }}</h3>
+        <div class="contractCollection">
+            <h3>List of Contracts</h3>
+            {% for contract in results %}
+                <li style="list-style-type:none;">
+                    <a href="/searchArt/{{ contract[0] }}">{{ contract[0] }}</a>
+                    <p>Contract ID: {{ contract[3] }}</p>
+                    <p>Percent Stake: {{ contract[2] }}%</p>
+                </li>
+            {% endfor %}
+        </div>
+        <br>
+        <div class="transactionBox">
+            <h3>Try Buying a painting</h3>
+            <form class="buyContract" method="post" action="buyContract">
+                <input class="searchBar" type="text" name="searchText" placeholder="Enter an art piece name">
+                <button class="button is-info" type="submit">Search Piece</button> </form>
+        </div>
+    </section>
+</body>
+</html>
