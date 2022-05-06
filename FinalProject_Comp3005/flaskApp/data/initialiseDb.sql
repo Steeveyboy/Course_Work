@@ -15,7 +15,7 @@ CREATE TABLE Artwork(
     Artist text,
     Image_Address text,
     Year integer, 
-    Gallery text,
+    Gallery_Name text,
     Collection text
 );
 
@@ -28,7 +28,7 @@ CREATE TABLE Patron(
 CREATE TABLE OwnershipContract(
     Artwork_Title text,
     Patron_ID text,
-    ContractId integer primary key not null unique,
+    ContractId integer not null,
     percent_share float
 );
 
@@ -108,15 +108,21 @@ INSERT INTO Patron Values('Bill', 'Gates', null);
 INSERT INTO Patron Values('Jeff', 'Bezos', null);
 
 INSERT INTO OwnershipContract Values('Death of Rubén Salazar', 101, 300501, 25.0);
-INSERT INTO OwnershipContract Values('Death of Rubén Salazar', 102, null, 25.0);
-INSERT INTO OwnershipContract Values('Hindu Merchants', 103, null, 10.0);
-INSERT INTO OwnershipContract Values('An Interlude', 101, null, 20.0);
-INSERT INTO OwnershipContract Values('An Interlude', 103, null, 20.0);
-INSERT INTO OwnershipContract Values('An Interlude', 104, null, 20.0);
-INSERT INTO OwnershipContract Values('An Interlude', 105, null, 20.0);
-INSERT INTO OwnershipContract Values('The Thundershower', 102, null, 5.0);
-INSERT INTO OwnershipContract Values('The Thundershower', 102, null, 5.0);
-INSERT INTO OwnershipContract Values('The Thundershower', 102, null, 5.0);
+INSERT INTO OwnershipContract Values('Death of Rubén Salazar', 102, 300501, 25.0);
+INSERT INTO OwnershipContract Values('Hindu Merchants', 103, 300502, 10.0);
+INSERT INTO OwnershipContract Values('An Interlude', 101, 300503, 20.0);
+INSERT INTO OwnershipContract Values('An Interlude', 103, 300503, 20.0);
+INSERT INTO OwnershipContract Values('An Interlude', 104, 300503, 20.0);
+INSERT INTO OwnershipContract Values('An Interlude', 105, 300503, 20.0);
+INSERT INTO OwnershipContract Values('The Thundershower', 102, 300504, 5.0);
+INSERT INTO OwnershipContract Values('The Thundershower', 102, 300504, 5.0);
+INSERT INTO OwnershipContract Values('The Thundershower', 102, 300504, 5.0);
+INSERT INTO OwnershipContract Values('Large Check: 6', 109, 300505, 50.1);
+INSERT INTO OwnershipContract Values('Large Check: 6', 110, 300505, 10.0);
+INSERT INTO OwnershipContract Values('Large Check: 6', 111, 300505, 10.0);
+INSERT INTO OwnershipContract Values('Double Transparency', 106, 300506, 10.0);
+INSERT INTO OwnershipContract Values('Double Transparency', 109, 300506, 50.1);
+INSERT INTO OwnershipContract Values("Haskell's House", 107, 300506, 99.0);
 
 COMMIT;
 

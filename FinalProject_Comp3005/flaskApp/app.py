@@ -1,13 +1,15 @@
 from flask import Flask, render_template, request, redirect
 import dbManager
 
+# This program will manage the backend of the webapp, and will generate templates based off of requests from the webpage
+# The SQL queries are managed by the custom made dbManager.
+
 app = Flask(__name__)
 
 dbm = dbManager.dbManager()
 
 @app.route("/")
 def landing():
-    landingArt = dbm.get_by_title("Ocean Life")
     return render_template("index.html", results=[])
 
 @app.route("/random")
@@ -52,7 +54,9 @@ def viewPiece(title):
 
 @app.route("/user/<patron_id>", methods=["GET", "POST"])
 def viewPatronCollection(patron_id):
-    if(requests.method == "POST")
+    if(request.method == "POST"):
+        dbm.create_contract(patron_id, request.form['artpieceTitle'], request.form['artpieceStake'])
+        print(patron_id, request.form['artpieceTitle'], request.form['artpieceStake'])
+
     contracts = dbm.get_patron_collection(patron_id)
     return render_template("PatronTemplate.html", results=contracts)
-

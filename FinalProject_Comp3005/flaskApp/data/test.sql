@@ -2,7 +2,8 @@
 
 -- Find a patrons art collection
 with 
-    contracts(Artwork_Title, Patron_ID, percent_share, ContractId, First_Name, Last_Name) AS (select Artwork_Title, Patron.Patron_ID, percent_share, ContractId, First_Name, Last_Name from OwnershipContract 
+    contracts(Artwork_Title, Patron_ID, percent_share, ContractId, First_Name, Last_Name) AS 
+    (select Artwork_Title, Patron.Patron_ID, percent_share, ContractId, First_Name, Last_Name from OwnershipContract 
     join Patron on OwnershipContract.Patron_ID = Patron.Patron_ID)
 Select * from contracts where Patron_ID = 101;
 
