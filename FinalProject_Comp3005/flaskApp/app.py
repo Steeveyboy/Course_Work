@@ -60,3 +60,12 @@ def viewPatronCollection(patron_id):
 
     contracts = dbm.get_patron_collection(patron_id)
     return render_template("PatronTemplate.html", results=contracts)
+
+# @app.route("/upload", methods=["GET", "POST"])
+# def uploadPiece():
+#     if request.method == "POST":
+#         dbm.
+
+if __name__ == '__main__':
+    app.run(host="localhost", port=4001, debug=True)
+
