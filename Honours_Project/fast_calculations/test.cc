@@ -1,6 +1,7 @@
 #include <iostream>
-#include <cpr/cpr.h>
+// #include <WinSock2.h>
 
+// We will try using C/C++ to make large calculations
 
 using namespace std;
 
