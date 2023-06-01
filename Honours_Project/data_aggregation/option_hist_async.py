@@ -3,12 +3,13 @@ from datetime import datetime, timedelta
 # from option_webscraper import insertData
 import asyncio
 import sqlite3
+from time import time
 
 
 conn = sqlite3.connect("options_database.db")
 
 
-START_DATE = datetime.strptime('2023-05-27', '%Y-%m-%d').date()
+START_DATE = datetime.strptime('2022-6-01', '%Y-%m-%d').date()
 NEAR_TERM = 23
 NEXT_TERM = 37
 CURR_DATE = datetime.today().date()
@@ -38,7 +39,7 @@ def insert_all_data(data):
     cur = conn.cursor()
     data.pop("s")
     pivoted_data = [dict(zip(data.keys(), col)) for col in zip(*data.values())]
-    print(f'inserting data for {dataTuple[-2]}', end='\t')
+    print(f'inserting data for {datetime.fromtimestamp(pivoted_data[0]["updated"]).strftime("%Y-%m-%d")}')
     for option in pivoted_data:
         dataTuple = format_data_tuple(option)
         insertData(dataTuple, cur)
@@ -63,21 +64,18 @@ async def main(ticker):
     s = AsyncHTMLSession()
     obs_date = START_DATE
     while obs_date < CURR_DATE:
-        await fetch_data(ticker, obs_date, s)
-        # if res.ok:
-        #     insert_all_data(res.json(), dbconn)
-        #     try:
-        #         dbconn.commit()
-        #         print("successs", end='\n')
-        #     except:
-        #         print("fail", end='\n')
+        task = asyncio.create_task(fetch_data(ticker, obs_date, s))
         
         obs_date += timedelta(days=1)
+        await asyncio.sleep(0.1)
+    await task
         
     # cur.close()
         
 if __name__ == "__main__":
     tick = "AAPL"
     # conn = sqlite3.connect("options_database.db")
+    starttime = time()
     asyncio.run(main(tick))
+    print(f"Final Time {time() - starttime}")
     
