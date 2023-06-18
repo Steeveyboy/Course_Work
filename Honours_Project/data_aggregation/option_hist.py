@@ -3,17 +3,20 @@ from datetime import datetime, timedelta
 from time import time
 # from option_webscraper import insertData
 import sqlite3
+import sys
 
 
 conn = sqlite3.connect("options_database.db")
 
 
-START_DATE = datetime.strptime('2023-05-01', '%Y-%m-%d').date()
+START_DATE = datetime.strptime('2020-01-03', '%Y-%m-%d').date()
 NEAR_TERM = 23
 NEXT_TERM = 37
 CURR_DATE = datetime.today().date()
 
-link = "https://api.marketdata.app/v1/options/chain/{ticker}/?date={obs_date}&from={from_date}&to={to_date}"
+token = open('tokens.txt', 'r').read()
+
+link = "https://api.marketdata.app/v1/options/chain/{ticker}/?token={token}&date={obs_date}&from={from_date}&to={to_date}"
 
 def fetch_data(ticker, obs_date, s):
     starttime = time()
@@ -21,7 +24,7 @@ def fetch_data(ticker, obs_date, s):
     print(f"fetching data for {obs_date}", end = '\t')
     near_date = obs_date + timedelta(days=NEAR_TERM)
     next_date = obs_date + timedelta(days=NEXT_TERM)
-    res = s.get(link.format(ticker=ticker, obs_date=obs_date, from_date=near_date, to_date=next_date))
+    res = s.get(link.format(ticker=ticker, token=token, obs_date=obs_date, from_date=near_date, to_date=next_date))
 
     if res.ok:
         insert_all_data(res.json())
@@ -67,13 +70,16 @@ def main(ticker):
     obs_date = START_DATE
     while obs_date < CURR_DATE:
         fetch_data(ticker, obs_date, s)
-        obs_date += timedelta(days=1)
+        obs_date += timedelta(days=7)
 
         
 if __name__ == "__main__":
     tick = "AAPL"
     starttime = time()
-    # conn = sqlite3.connect("options_database.db")
+    if len(sys.argv) > 1:
+        print(sys.argv)
+        tick = sys.argv[1]
+    conn = sqlite3.connect("options_database.db")
     main(tick)
     print(f"Final Time {time() - starttime}")
     

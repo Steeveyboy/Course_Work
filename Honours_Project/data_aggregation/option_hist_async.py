@@ -2,26 +2,29 @@ from requests_html import HTMLSession, AsyncHTMLSession
 from datetime import datetime, timedelta
 # from option_webscraper import insertData
 import asyncio
-import sqlite3
+import sqlite3, sys
 from time import time
 
 
 conn = sqlite3.connect("options_database.db")
 
 
-START_DATE = datetime.strptime('2022-6-01', '%Y-%m-%d').date()
+START_DATE = datetime.strptime('2010-1-01', '%Y-%m-%d').date()
 NEAR_TERM = 23
 NEXT_TERM = 37
-CURR_DATE = datetime.today().date()
+CURR_DATE = datetime.strptime('2020-1-03', '%Y-%m-%d').date()
+# CURR_DATE = datetime.today().date()
+TOKEN = open('tokens.txt', 'r').read()
 
-link = "https://api.marketdata.app/v1/options/chain/{ticker}/?date={obs_date}&from={from_date}&to={to_date}"
+link = "https://api.marketdata.app/v1/options/chain/{ticker}/?token={token}&date={obs_date}&from={from_date}&to={to_date}"
+
 
 async def fetch_data(ticker, obs_date, s):
     ## TODO create request to server for data
     print(f"fetching data for {obs_date}")
     near_date = obs_date + timedelta(days=NEAR_TERM)
     next_date = obs_date + timedelta(days=NEXT_TERM)
-    res = await s.get(link.format(ticker=ticker, obs_date=obs_date, from_date=near_date, to_date=next_date))
+    res = await s.get(link.format(ticker=ticker, token=TOKEN, obs_date=obs_date, from_date=near_date, to_date=next_date))
     # return res
     if res.ok:
         insert_all_data(res.json())
@@ -66,7 +69,7 @@ async def main(ticker):
     while obs_date < CURR_DATE:
         task = asyncio.create_task(fetch_data(ticker, obs_date, s))
         
-        obs_date += timedelta(days=1)
+        obs_date += timedelta(days=7)
         await asyncio.sleep(0.1)
     await task
         
@@ -75,6 +78,9 @@ async def main(ticker):
 if __name__ == "__main__":
     tick = "AAPL"
     # conn = sqlite3.connect("options_database.db")
+    if len(sys.argv) > 1:
+        print(sys.argv)
+        tick = sys.argv[1]
     starttime = time()
     asyncio.run(main(tick))
     print(f"Final Time {time() - starttime}")
