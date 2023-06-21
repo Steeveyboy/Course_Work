@@ -9,11 +9,11 @@ from time import time
 conn = sqlite3.connect("options_database.db")
 
 
-START_DATE = datetime.strptime('2010-1-01', '%Y-%m-%d').date()
+START_DATE = datetime.strptime('2020-01-03', '%Y-%m-%d').date()
 NEAR_TERM = 23
 NEXT_TERM = 37
-CURR_DATE = datetime.strptime('2020-1-03', '%Y-%m-%d').date()
-# CURR_DATE = datetime.today().date()
+# CURR_DATE = datetime.strptime('2020-1-03', '%Y-%m-%d').date()
+CURR_DATE = datetime.today().date()
 TOKEN = open('tokens.txt', 'r').read()
 
 link = "https://api.marketdata.app/v1/options/chain/{ticker}/?token={token}&date={obs_date}&from={from_date}&to={to_date}"
