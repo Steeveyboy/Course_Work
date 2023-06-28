@@ -50,7 +50,6 @@ def query_date(dt):
     ;
 """
 # '2023-05-12'
-
     cursor.execute(query)
     data = cursor.fetchall()
     return data
