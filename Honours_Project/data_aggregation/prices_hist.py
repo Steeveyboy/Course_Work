@@ -70,13 +70,15 @@ async def main(tickers):
         ls.append(task)
         await asyncio.sleep(0.125)
     # await task
+    await asyncio.sleep(0.5)
     await asyncio.gather(*ls)
 
 
 if __name__ == "__main__":
+    
     ticks = json.load(open('resources/tickers.json','r'))
     starttime = time()
-    asyncio.run(main(list(ticks.keys())[5000:]))
+    asyncio.run(main(list(ticks.keys())))
     print(f"Final Time {time() - starttime}")
     
     

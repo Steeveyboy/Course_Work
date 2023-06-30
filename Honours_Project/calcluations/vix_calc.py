@@ -1,3 +1,8 @@
+import sqlite3
+from scipy.interpolate import CubicSpline
+
+PERIODS = {'1mo': 30/365, '2mo': 60/365, '3mo':91/365, '4mo':121/365, '6mo':182/365, '1yr':1, '2yr':2, '3yr':3, '5yr':5, '7yr':7, '10yr':10, '20yr':20, '30yr':30}
+
 def out_of_money(x):
     if x['contract_type'] == 'call':
         if(x['strike'] > x['stock_price']):
@@ -32,6 +37,25 @@ def my_row_factory(cur, row):
         d[col[0].lower()] = row[idx]
     return d
 
+NEWQUERY = """
+with temptable as (
+SELECT
+	*
+FROM contract_data
+WHERE 
+	contract_data.symbol ='SPY'
+    and obs_date = {dt})
+select 
+    temptable.*,
+    price_data.close as stock_price
+from temptable
+join price_data
+    on (price_data.Symbol = temptable.Symbol) and (price_data.date_of_close = temptable.Obs_Date)
+     where
+		 (Exp_Date = (select min(Exp_Date) from temptable)) or Exp_Date = (select max(Exp_Date) from temptable)
+;
+"""
+
 def query_date(dt):
     conn = sqlite3.connect("../data_aggregation/options_database.db")
     conn.row_factory = my_row_factory
@@ -54,8 +78,40 @@ def query_date(dt):
     data = cursor.fetchall()
     return data
 
+def query_treasury_rates(dt):
+    conn = sqlite3.connect("../data_aggregation/options_database.db")
+    conn.row_factory = my_row_factory
+    cursor = conn.cursor()
+    
+    QUERY = f"""
+    Select 
+        *
+    from treasury_rates
+    where date_of = '{dt}'
+    """
+    cursor.execute(QUERY)
+    data = cursor.fetchone()
+    return data
+
+def get_rfr(dt, T):
+    """
+    This function will calculate the risk free rate over a specified time (T in years) for a specified date (dt)
+    """
+    rates = query_treasury_rates(dt)
+    x = [PERIODS[i] for i in list(rates.keys())[1:]]
+    y = [j for j in list(rates.values())[1:]]
+    
+    cs = CubicSpline(x, y)
+    
+    return cs(T)
+
+
+
 if __name__ == '__main__':
-    data = query_date('2023-05-12')
+    DT = '2023-05-12'
+    data = query_date(DT)
+    # TNear = 
+    rfr = get_rfr(DT)
     dd = filter(out_of_money, data)
 
     calls = filter(lambda x: x['contract_type']=='call', dd)
