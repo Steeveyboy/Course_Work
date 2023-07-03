@@ -1,14 +1,16 @@
 import sqlite3
+import math, datetime
+from itertools import groupby
 from scipy.interpolate import CubicSpline
 
 PERIODS = {'1mo': 30/365, '2mo': 60/365, '3mo':91/365, '4mo':121/365, '6mo':182/365, '1yr':1, '2yr':2, '3yr':3, '5yr':5, '7yr':7, '10yr':10, '20yr':20, '30yr':30}
 
 def out_of_money(x):
     if x['contract_type'] == 'call':
-        if(x['strike'] > x['stock_price']):
+        if(x['strike'] >= x['stock_price']):
             return True
     else:
-        if(x['strike'] < x['stock_price']):
+        if(x['strike'] <= x['stock_price']):
             return True
     return False
 
@@ -106,12 +108,17 @@ def get_rfr(dt, T):
     return cs(T)
 
 
+def calc_forward(calls, puts, rtr, T):
+    """Calcluating the forward rate of option"""
+    F = calls[0]['strike'] + ((math.e ** (rtr*T)) * (calls[0]['midpoint'] - puts[0]['midpoint']))
+    return F
 
-if __name__ == '__main__':
-    DT = '2023-05-12'
-    data = query_date(DT)
-    # TNear = 
-    rfr = get_rfr(DT)
+def calc_T(date, exp_date):
+    """Calcluating the time to expiration in years"""
+    return (datetime.datetime.strptime(exp_date, '%Y-%m-%d') - datetime.datetime.strptime(date, '%Y-%m-%d')).days / 365
+
+def select_options(data):
+    """Select valid options from input data"""
     dd = filter(out_of_money, data)
 
     calls = filter(lambda x: x['contract_type']=='call', dd)
@@ -123,5 +130,37 @@ if __name__ == '__main__':
     calls2 = filter_serious(calls)
     puts2 = filter_serious(puts)
     
+    return calls2, puts2
+
+def calc_contributions(calls, puts, T, rfr, F):
+    """Calculating the individual contribution of each option returning a list"""
+    pass
+
+if __name__ == '__main__':
+    DT = '2023-05-12'
+    data = query_date(DT)
+
+    g = groupby(sorted(data, lambda x: x['exp_date']), key=lambda x: x['exp_date'])
+
+    contributions_ls = []
+    for exp_dt, opt_dat in g:
+        calls, puts = select_options(data)
+        T = calc_T(DT, exp_dt)
+        rfr = get_rfr(DT, T)
+        F = calc_forward(calls, puts, rfr, T)
+
+        contributions_ls.append(calc_contributions(calls, puts, T, rfr, F))
+
+
+
+
+    
+    # TNear = 
+    # TNext = 
+    # rfr = get_rfr(date, TNear)
+    # rfr = get_rfr(date, TNext)
+    # FNear = calc_forward(calls2, puts2, rtr, TNear)
+    # FNext = calc_forward(calls2, puts2, rtr, TNear)
+
     
     
