@@ -132,9 +132,41 @@ def select_options(data):
     
     return calls2, puts2
 
-def calc_contributions(calls, puts, T, rfr, F):
+def strike_interval(option1, option2):
+    """Calculates the interval between two strike prices"""
+    return abs(option1['strike'] - option2['strike']) / 2
+
+def calc_inv_contribution(option, strike_int, rfr, T):
+    return (strike_int / option['strike']**2)*math.e**(rfr*T)*option['midpoint']
+
+def calc_contributions(options, option_first, T, rfr):
+    ls = []
+
+    first_cont = calc_inv_contribution(options[0], strike_interval(option_first, options[1], rfr, T))
+    # first_contribution = strike_interval(option_first, options[1]) / (options[0]['strike']**2) * math.e**(rfr*T)*options[0] - constraint
+    ls.append(first_cont)
+
+    for i in range(1, len(options)):
+        ls.append(calc_inv_contribution(options[i], strike_interval(options[i-1], options[i+1]), rfr, T, F))
+    
+    return ls
+
+def calc_all_contributions(calls, puts, T, rfr, F):
     """Calculating the individual contribution of each option returning a list"""
-    pass
+    ls = []
+    Call_first = calls[0]
+    Puts_first = puts[0]
+    K_zero = calls[0]['Strike']
+    constraint = 1/T((F/K_zero - 1) ** 2)
+
+    ls.extend(calc_contributions(calls, Puts_first, T, rfr, constraint))
+    ls.extend(calc_contributions(puts, Call_first, T, rfr, constraint))
+
+    all_constributions = sum(ls)
+
+    variance = (1/T) * all_constributions - constraint 
+    
+    return variance
 
 if __name__ == '__main__':
     DT = '2023-05-12'
