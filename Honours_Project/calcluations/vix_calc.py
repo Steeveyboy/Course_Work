@@ -170,12 +170,13 @@ def calc_all_contributions(calls, puts, T, rfr, F):
     return variance
 
 if __name__ == '__main__':
-    DT = '2023-05-12'
+    DT = '2023-03-17'
     data = query_date(DT)
     print(len(data))
     g = groupby(sorted(data, key=lambda x: x['exp_date']), key=lambda x: x['exp_date'])
 
     contributions_ls = []
+    key_vars = []
     for exp_dt, opt_dat in g:
         print(exp_dt)
         calls, puts = select_options(list(opt_dat))
@@ -183,11 +184,12 @@ if __name__ == '__main__':
         T = calc_T(DT, exp_dt)
         rfr = get_rfr(DT, T)
         F = calc_forward(calls, puts, rfr, T)
-
+        key_vars.append({'T': T, 'rfr': rfr, 'F':F, 'N': (T*525600)})
         contributions_ls.append(calc_all_contributions(calls, puts, T, rfr, F))
 
     print(contributions_ls)
-    
+    VIX = 100 * math.sqrt(((key_vars[0]['T']*contributions_ls[0]*((key_vars[1]['N'] - 43200)/(key_vars[1]['N'] - key_vars[0]['N']))) + (key_vars[1]['T']*contributions_ls[1]*((43200 - key_vars[0]['N'])/(key_vars[1]['N'] - key_vars[0]['N'])))) * (525600/43200))
+    print(VIX)
     
 
 
