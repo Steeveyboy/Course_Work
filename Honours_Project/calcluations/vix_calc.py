@@ -72,7 +72,7 @@ def query_date(dt):
     on (price_data.Symbol = contract_data.Symbol) and (price_data.date_of_close = contract_data.obs_date)
         where
             contract_data.symbol ='SPY'
-            and obs_date = {dt}
+            and obs_date = '{dt}'
     ;
 """
 # '2023-05-12'
@@ -119,10 +119,11 @@ def calc_T(date, exp_date):
 
 def select_options(data):
     """Select valid options from input data"""
-    dd = filter(out_of_money, data)
-
-    calls = filter(lambda x: x['contract_type']=='call', dd)
-    puts = filter(lambda x: x['contract_type']=='put', dd)
+    calls = filter(lambda x: x['contract_type']=='call', data)
+    puts = filter(lambda x: x['contract_type']=='put', data)
+    
+    calls = filter(out_of_money, calls)
+    puts = filter(out_of_money, puts)
 
     calls = sorted(calls, key=lambda x: abs(x['strike'] - x['stock_price']))
     puts = sorted(puts, key=lambda x: abs(x['strike'] - x['stock_price']))
@@ -142,12 +143,12 @@ def calc_inv_contribution(option, strike_int, rfr, T):
 def calc_contributions(options, option_first, T, rfr):
     ls = []
 
-    first_cont = calc_inv_contribution(options[0], strike_interval(option_first, options[1], rfr, T))
+    first_cont = calc_inv_contribution(options[0], strike_interval(option_first, options[1]), rfr, T)
     # first_contribution = strike_interval(option_first, options[1]) / (options[0]['strike']**2) * math.e**(rfr*T)*options[0] - constraint
     ls.append(first_cont)
 
-    for i in range(1, len(options)):
-        ls.append(calc_inv_contribution(options[i], strike_interval(options[i-1], options[i+1]), rfr, T, F))
+    for i in range(1, len(options)-1):
+        ls.append(calc_inv_contribution(options[i], strike_interval(options[i-1], options[i+1]), rfr, T))
     
     return ls
 
@@ -156,11 +157,11 @@ def calc_all_contributions(calls, puts, T, rfr, F):
     ls = []
     Call_first = calls[0]
     Puts_first = puts[0]
-    K_zero = calls[0]['Strike']
-    constraint = 1/T((F/K_zero - 1) ** 2)
+    K_zero = calls[0]['strike']
+    constraint = (1/T)*((F/K_zero - 1) ** 2)
 
-    ls.extend(calc_contributions(calls, Puts_first, T, rfr, constraint))
-    ls.extend(calc_contributions(puts, Call_first, T, rfr, constraint))
+    ls.extend(calc_contributions(calls, Puts_first, T, rfr))
+    ls.extend(calc_contributions(puts, Call_first, T, rfr))
 
     all_constributions = sum(ls)
 
@@ -171,19 +172,23 @@ def calc_all_contributions(calls, puts, T, rfr, F):
 if __name__ == '__main__':
     DT = '2023-05-12'
     data = query_date(DT)
-
-    g = groupby(sorted(data, lambda x: x['exp_date']), key=lambda x: x['exp_date'])
+    print(len(data))
+    g = groupby(sorted(data, key=lambda x: x['exp_date']), key=lambda x: x['exp_date'])
 
     contributions_ls = []
     for exp_dt, opt_dat in g:
-        calls, puts = select_options(data)
+        print(exp_dt)
+        calls, puts = select_options(list(opt_dat))
+        print(len(calls), len(puts))
         T = calc_T(DT, exp_dt)
         rfr = get_rfr(DT, T)
         F = calc_forward(calls, puts, rfr, T)
 
-        contributions_ls.append(calc_contributions(calls, puts, T, rfr, F))
+        contributions_ls.append(calc_all_contributions(calls, puts, T, rfr, F))
 
-
+    print(contributions_ls)
+    
+    
 
 
     

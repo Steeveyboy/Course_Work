@@ -1,0 +1,11 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "finance_conn",
+            "database": "${workspaceFolder:Honours_Project}/data_aggregation/options_database.db"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
+}
