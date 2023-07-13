@@ -59,21 +59,15 @@ def query_date(dt):
     cursor = conn.cursor()
 
     query = f"""
-    with temptable as (
-    SELECT
-        *
-    FROM contract_data
-    WHERE 
-        contract_data.symbol ='SPY'
-        and obs_date = '{dt}')
     select 
-        temptable.*,
+        contract_data.*,
         price_data.close as stock_price
-    from temptable
+    from contract_data
     join price_data
-        on (price_data.Symbol = temptable.Symbol) and (price_data.date_of_close = temptable.Obs_Date)
+    on (price_data.Symbol = contract_data.Symbol) and (price_data.date_of_close = contract_data.obs_date)
         where
-            (Exp_Date = (select min(Exp_Date) from temptable)) or Exp_Date = (select max(Exp_Date) from temptable)
+            contract_data.symbol ='SPY'
+            and obs_date = '{dt}'
     ;
     """
 

@@ -7,7 +7,7 @@ CREATE TABLE "Price_Data"(
     "close" float NOT NULL,
     "high" float NOT NULL,
     "low" float NOT NULL,
-    "volume" int NOT NULL,
+    "volume" int,
     "date_of" DATE NOT NULL
 
 );
