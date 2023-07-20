@@ -10,7 +10,7 @@ def out_of_money(x):
         if(x['strike'] >= x['stock_price']):
             return True
     else:
-        if(x['strike'] <= x['stock_price']):
+        if(x['strike'] <= (x['stock_price'])):
             return True
     return False
 
@@ -31,7 +31,8 @@ def filter_serious(ls):
             prev_serious = False
     return new_ls
 
-
+def test_auto():
+    return "TEST WOR2342342KED"
 
 def my_row_factory(cur, row):
     d={}
@@ -53,21 +54,55 @@ on (price_data.Symbol = contract_data.Symbol) and (price_data.date_of_close = co
 ;
 """
 
+
+query_old = """
+with temptable as (
+SELECT
+    *
+FROM contract_data
+WHERE 
+    contract_data.symbol ='SPY'
+    and obs_date = '{dt}')
+select 
+    temptable.*,
+    price_data.close as stock_price
+from temptable
+join price_data
+    on (price_data.Symbol = temptable.Symbol) and (price_data.date_of_close = temptable.Obs_Date)
+    where
+        (Exp_Date = (select min(Exp_Date) from temptable)) or Exp_Date = (select max(Exp_Date) from temptable)
+;
+"""
+
 def query_date(dt):
-    conn = sqlite3.connect("../data_aggregation/options_database.db")
+    conn = sqlite3.connect("../data_aggregation/flow_database.db")
     conn.row_factory = my_row_factory
     cursor = conn.cursor()
-
+    
     query = f"""
     with temptable as (
     SELECT
-        *
+        symbol,
+        Contract_Type,
+        Strike,
+        Bid,
+        Midpoint,
+        Ask,
+        Obs_Date,
+        Exp_Date
     FROM contract_data
     WHERE 
         contract_data.symbol ='SPY'
         and obs_date = '{dt}')
     select 
-        temptable.*,
+        temptable.symbol,
+        temptable.Contract_Type,
+        temptable.Strike,
+        temptable.bid,
+        temptable.Midpoint,
+        temptable.ask,
+        temptable.Obs_Date,
+        temptable.Exp_Date,
         price_data.close as stock_price
     from temptable
     join price_data
@@ -101,9 +136,13 @@ def get_rfr(dt, T):
     This function will calculate the risk free rate over a specified time (T in years) for a specified date (dt)
     """
     rates = query_treasury_rates(dt)
-    x = [PERIODS[i] for i in list(rates.keys())[1:]]
-    y = [j for j in list(rates.values())[1:]]
-    
+    if not rates:
+        return
+    # print(rates)
+    x = [PERIODS[i] for i,j in list(rates.items())[1:] if j is not None]
+    y = [j for j in list(rates.values())[1:]  if j is not None]
+    # print(x)
+    # print(y)
     cs = CubicSpline(x, y)
     
     return cs(T)
@@ -111,6 +150,7 @@ def get_rfr(dt, T):
 
 def calc_forward(calls, puts, rtr, T):
     """Calcluating the forward rate of option"""
+    print(calls[0], '\n', puts[0])
     F = calls[0]['strike'] + ((math.e ** (rtr*T)) * (calls[0]['midpoint'] - puts[0]['midpoint']))
     return F
 
@@ -139,7 +179,7 @@ def strike_interval(option1, option2):
     return abs(option1['strike'] - option2['strike']) / 2
 
 def calc_inv_contribution(option, strike_int, rfr, T):
-    return (strike_int / option['strike']**2)*math.e**(rfr*T)*option['midpoint']
+    return (strike_int / (option['strike']**2))*(math.e**(rfr*T))*option['midpoint']
 
 def calc_contributions(options, option_first, T, rfr):
     ls = []
@@ -164,34 +204,48 @@ def calc_all_contributions(calls, puts, T, rfr, F):
     ls.extend(calc_contributions(calls, Puts_first, T, rfr))
     ls.extend(calc_contributions(puts, Call_first, T, rfr))
 
-    all_constributions = sum(ls)
-
-    variance = (1/T) * all_constributions - constraint 
+    all_contributions = sum(ls)
+    # print("contributions:", all_contributions, "CONSTRAINT:", constraint, f"F {F}    K_Zero {K_zero}   T {T}")
+    variance = (2/T) * all_contributions - constraint 
     
     return variance
 
 
 def main(DT):
-
+    print(f'calculating VIX for {DT}')
     data = query_date(DT)
-    print(len(data))
+    # print(len(data))
+    
+    if len(data) == 0:
+        return None
+    
     g = groupby(sorted(data, key=lambda x: x['exp_date']), key=lambda x: x['exp_date'])
-
     contributions_ls = []
     key_vars = []
     for exp_dt, opt_dat in g:
         print(exp_dt)
         calls, puts = select_options(list(opt_dat))
-        print(len(calls), len(puts))
+        # print(len(calls), len(puts))
         T = calc_T(DT, exp_dt)
+        
         rfr = get_rfr(DT, T)
+        if not rfr:
+            return
+        
         F = calc_forward(calls, puts, rfr, T)
+        
+        # F = 0.00
+        # print(F, "FFFFF")
         key_vars.append({'T': T, 'rfr': rfr, 'F':F, 'N': (T*525600)})
         contributions_ls.append(calc_all_contributions(calls, puts, T, rfr, F))
 
-    print(contributions_ls)
-    VIX = 100 * math.sqrt(((key_vars[0]['T']*contributions_ls[0]*((key_vars[1]['N'] - 43200)/(key_vars[1]['N'] - key_vars[0]['N']))) + (key_vars[1]['T']*contributions_ls[1]*((43200 - key_vars[0]['N'])/(key_vars[1]['N'] - key_vars[0]['N'])))) * (525600/43200))
-    print(VIX)
+    # print(contributions_ls)
+    time_diff1 = (abs(key_vars[1]['N'] - 43200)/(key_vars[1]['N'] - key_vars[0]['N']))
+    time_diff2 = (abs(key_vars[0]['N'] - 43200)/(key_vars[1]['N'] - key_vars[0]['N']))
+    
+    VIX = 100 * math.sqrt( ((key_vars[0]['T'] * contributions_ls[0] * time_diff1) + (key_vars[1]['T'] * contributions_ls[1]*time_diff2)) * (525600/43200) )
+    return VIX
+    
     
 if __name__ == '__main__':
     DT = '2023-03-17'
@@ -199,9 +253,8 @@ if __name__ == '__main__':
         DT = sys.argv[1]
     print(f'calculating VIX for {DT}')
     starttime = time.time()
-    main(DT)
+    VIX = main(DT)
+    print(VIX)
     print(f'Finished in {time.time() - starttime} seconds')
 
 
-    
-    
