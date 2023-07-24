@@ -31,8 +31,24 @@ def filter_serious(ls):
             prev_serious = False
     return new_ls
 
-def test_auto():
-    return "TEST WOR2342342KED"
+def calc_spot_value(strike, opt_price, curr_price, contract_type):
+    """Calculate Intrinsic Value for option price"""
+
+def select_options(data):
+    """Select valid options from input data"""
+    calls = filter(lambda x: x['contract_type']=='call', data)
+    puts = filter(lambda x: x['contract_type']=='put', data)
+    
+    # calls = filter(out_of_money, calls)
+    # puts = filter(out_of_money, puts)
+
+    calls = sorted(calls, key=lambda x: abs(x['strike'] - x['stock_price']))
+    puts = sorted(puts, key=lambda x: abs(x['strike'] - x['stock_price']))
+
+    calls2 = filter_serious(calls)
+    puts2 = filter_serious(puts)
+    
+    return calls2, puts2
 
 def my_row_factory(cur, row):
     d={}
@@ -40,39 +56,6 @@ def my_row_factory(cur, row):
         d[col[0].lower()] = row[idx]
     return d
 
-
-orig_query = """
-select 
-    contract_data.*,
-    price_data.close as stock_price
-from contract_data
-join price_data
-on (price_data.Symbol = contract_data.Symbol) and (price_data.date_of_close = contract_data.obs_date)
-    where
-        contract_data.symbol ='SPY'
-        and obs_date = '{dt}'
-;
-"""
-
-
-query_old = """
-with temptable as (
-SELECT
-    *
-FROM contract_data
-WHERE 
-    contract_data.symbol ='SPY'
-    and obs_date = '{dt}')
-select 
-    temptable.*,
-    price_data.close as stock_price
-from temptable
-join price_data
-    on (price_data.Symbol = temptable.Symbol) and (price_data.date_of_close = temptable.Obs_Date)
-    where
-        (Exp_Date = (select min(Exp_Date) from temptable)) or Exp_Date = (select max(Exp_Date) from temptable)
-;
-"""
 
 def query_date(dt):
     conn = sqlite3.connect("../data_aggregation/flow_database.db")
@@ -158,21 +141,7 @@ def calc_T(date, exp_date):
     """Calcluating the time to expiration in years"""
     return (datetime.datetime.strptime(exp_date, '%Y-%m-%d') - datetime.datetime.strptime(date, '%Y-%m-%d')).days / 365
 
-def select_options(data):
-    """Select valid options from input data"""
-    calls = filter(lambda x: x['contract_type']=='call', data)
-    puts = filter(lambda x: x['contract_type']=='put', data)
-    
-    calls = filter(out_of_money, calls)
-    puts = filter(out_of_money, puts)
 
-    calls = sorted(calls, key=lambda x: abs(x['strike'] - x['stock_price']))
-    puts = sorted(puts, key=lambda x: abs(x['strike'] - x['stock_price']))
-
-    calls2 = filter_serious(calls)
-    puts2 = filter_serious(puts)
-    
-    return calls2, puts2
 
 def strike_interval(option1, option2):
     """Calculates the interval between two strike prices"""
