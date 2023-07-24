@@ -145,7 +145,7 @@ def get_rfr(dt, T):
     # print(y)
     cs = CubicSpline(x, y)
     
-    return cs(T)
+    return cs(T) / 100
 
 
 def calc_forward(calls, puts, rtr, T):
@@ -179,6 +179,7 @@ def strike_interval(option1, option2):
     return abs(option1['strike'] - option2['strike']) / 2
 
 def calc_inv_contribution(option, strike_int, rfr, T):
+    # print(rfr, T, math.e**(rfr*T))
     return (strike_int / (option['strike']**2))*(math.e**(rfr*T))*option['midpoint']
 
 def calc_contributions(options, option_first, T, rfr):
@@ -240,6 +241,7 @@ def main(DT):
         contributions_ls.append(calc_all_contributions(calls, puts, T, rfr, F))
 
     # print(contributions_ls)
+    print(key_vars)
     time_diff1 = (abs(key_vars[1]['N'] - 43200)/(key_vars[1]['N'] - key_vars[0]['N']))
     time_diff2 = (abs(key_vars[0]['N'] - 43200)/(key_vars[1]['N'] - key_vars[0]['N']))
     
