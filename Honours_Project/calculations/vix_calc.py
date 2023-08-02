@@ -51,39 +51,6 @@ def my_row_factory(cur, row):
     return d
 
 
-orig_query = """
-select 
-    contract_data.*,
-    price_data.close as stock_price
-from contract_data
-join price_data
-on (price_data.Symbol = contract_data.Symbol) and (price_data.date_of_close = contract_data.obs_date)
-    where
-        contract_data.symbol ='SPY'
-        and obs_date = '{dt}'
-;
-"""
-
-
-query_old = """
-with temptable as (
-SELECT
-    *
-FROM contract_data
-WHERE 
-    contract_data.symbol ='SPY'
-    and obs_date = '{dt}')
-select 
-    temptable.*,
-    price_data.close as stock_price
-from temptable
-join price_data
-    on (price_data.Symbol = temptable.Symbol) and (price_data.date_of_close = temptable.Obs_Date)
-    where
-        (Exp_Date = (select min(Exp_Date) from temptable)) or Exp_Date = (select max(Exp_Date) from temptable)
-;
-"""
-
 def query_date(dt):
     conn = sqlite3.connect("../data_aggregation/flow_database.db")
     conn.row_factory = my_row_factory
@@ -127,7 +94,7 @@ def query_date(dt):
     return data
 
 def query_treasury_rates(dt):
-    conn = sqlite3.connect("../data_aggregation/options_database.db")
+    conn = sqlite3.connect("../data_aggregation/flow_database.db")
     conn.row_factory = my_row_factory
     cursor = conn.cursor()
     
