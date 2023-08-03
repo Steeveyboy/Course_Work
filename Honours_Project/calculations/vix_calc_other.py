@@ -41,10 +41,6 @@ def filter_serious(ls):
             prev_serious = False
     return new_ls
 
-def calc_intrinsic_price(row):
-    """Calculates the intrinsic price of an option."""
-    pass
-
 def my_row_factory(cur, row):
     d={}
     for idx, col in enumerate(cur.description):
@@ -149,13 +145,33 @@ def select_options(data):
     
     return calls2, puts2
 
+def select_options_W_OTM(data):
+    
+    calls = filter(lambda x: x['contract_type']=='call', data)
+    puts = filter(lambda x: x['contract_type']=='put', data)
+
+    calls = sorted(calls, key=lambda x: abs(x['strike'] - x['stock_price']))
+    puts = sorted(puts, key=lambda x: abs(x['strike'] - x['stock_price']))
+
+    calls2 = filter_serious(calls)
+    puts2 = filter_serious(puts)
+    
+    return calls2, puts2
+
 def strike_interval(option1, option2):
     """Calculates the interval between two strike prices"""
     return abs(option1['strike'] - option2['strike']) / 2
 
+def calc_intrinsic_price(row):
+    """Calculates the intrinsic price of an option."""
+    
+    pass
+
 def calc_inv_contribution(option, strike_int, rfr, T):
-    # print(rfr, T, math.e**(rfr*T))
-    return (strike_int / (option['strike']**2))*(math.e**(rfr*T))*option['midpoint']
+    return (strike_int / (option['strike']**2))*(math.e**(rfr*T)) * option['midpoint']
+
+def calc_inv_contribution_OTM(option, strike_int, rfr, T):
+    return (strike_int / (option['strike']**2))*(math.e**(rfr*T)) * option['in_price']
 
 def calc_contributions(options, option_first, T, rfr):
     ls = []
@@ -198,7 +214,7 @@ def main(DT):
     key_vars = []
     for exp_dt, opt_dat in g:
         # print(exp_dt)
-        calls, puts = select_options(list(opt_dat))
+        calls, puts = select_options_W_OTM(list(opt_dat))
         T = calc_T(DT, exp_dt)
         
         rfr = get_rfr(DT, T)
