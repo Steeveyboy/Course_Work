@@ -61,9 +61,10 @@ def query_spy(DT):
     
     return data
 
-def observe_vix_acc(DT):
+def observe_vix_acc(DT, vix_formula=vix_calc.main):
     """This function will calculate thee """
-    VIX = vix_calc.main(DT)
+    # VIX = vix_calc.main(DT)
+    VIX = vix_formula(DT)
     data = query_spy(DT)
     start_close = data.iloc[0].close
     

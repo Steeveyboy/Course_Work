@@ -2,208 +2,67 @@ import sqlite3
 import math, datetime, sys, time
 from itertools import groupby
 from scipy.interpolate import CubicSpline
+# import vix_calc_functions as vix_funcs
+from vix_calc_functions import *
 
-PERIODS = {'1mo': 30/365, '2mo': 60/365, '3mo':91/365, '4mo':121/365, '6mo':182/365, '1yr':1, '2yr':2, '3yr':3, '5yr':5, '7yr':7, '10yr':10, '20yr':20, '30yr':30}
 
-def out_of_money(x):
-    if x['contract_type'] == 'call':
-        if(x['strike'] >= x['stock_price']):
-            return True
+def get_intrisic_price(data):
+    if data['contract_type'] == 'call':
+        return data["stock_price"] - data["strike"]
     else:
-        if(x['strike'] <= (x['stock_price'])):
-            return True
-    return False
-
-def get_period_volatility(VIX, period):
-    """Calculates the expected implied volatility for given time period.
-        period must be a decimal between 0 and 1 representing a fraction of a year.
-        VIX must be the VIX.
-    """
-    try:
-        return VIX/(math.sqrt(1/period))
-    except:
-        return 0
-
-def check_serious(bid, ask):
-    return (bid > 0 and ask > 0)
-
-def filter_serious(ls):
-    ## Takes in a list of options sorted by ascending difference between strike and stock_price.
-    new_ls = []
-    prev_serious = True
-    for opt in ls:
-        if check_serious(opt['bid'], opt['ask']):
-            new_ls.append(opt)
-            prev_serious = True
-        else:
-            if not prev_serious:
-                break
-            prev_serious = False
-    return new_ls
-
-def my_row_factory(cur, row):
-    d={}
-    for idx, col in enumerate(cur.description):
-        d[col[0].lower()] = row[idx]
-    return d
-
-
-def query_date(dt):
-    conn = sqlite3.connect("../data_aggregation/flow_database.db")
-    conn.row_factory = my_row_factory
-    cursor = conn.cursor()
+        return data["strike"] - data["stock_price"]
     
-    query = f"""
-    with temptable as (
-    SELECT
-        symbol,
-        Contract_Type,
-        Strike,
-        Bid,
-        Midpoint,
-        Ask,
-        Obs_Date,
-        Exp_Date
-    FROM contract_data
-    WHERE 
-        contract_data.symbol ='SPY'
-        and obs_date = '{dt}')
-    select 
-        temptable.symbol,
-        temptable.Contract_Type,
-        temptable.Strike,
-        temptable.bid,
-        temptable.Midpoint,
-        temptable.ask,
-        temptable.Obs_Date,
-        temptable.Exp_Date,
-        price_data.close as stock_price
-    from temptable
-    join price_data
-        on (price_data.Symbol = temptable.Symbol) and (price_data.date_of_close = temptable.Obs_Date)
-        where
-            (Exp_Date = (select min(Exp_Date) from temptable)) or Exp_Date = (select max(Exp_Date) from temptable)
-    ;
-    """
-
-    cursor.execute(query)
-    data = cursor.fetchall()
+def calc_uncertain_all(data):
+    for i in range(len(data)):
+        data[i]['uncert'] = data[i]['midpoint'] - get_intrisic_price(data[i])
     return data
-
-def query_treasury_rates(dt):
-    conn = sqlite3.connect("../data_aggregation/flow_database.db")
-    conn.row_factory = my_row_factory
-    cursor = conn.cursor()
     
-    QUERY = f"""
-    Select 
-        *
-    from treasury_rates
-    where date_of = '{dt}'
-    """
-    cursor.execute(QUERY)
-    data = cursor.fetchone()
-    return data
 
-def get_rfr(dt, T):
-    """
-    This function will calculate the risk free rate over a specified time (T in years) for a specified date (dt)
-    """
-    rates = query_treasury_rates(dt)
-    if not rates:
-        return
-    # print(rates)
-    x = [PERIODS[i] for i,j in list(rates.items())[1:] if j is not None]
-    y = [j for j in list(rates.values())[1:]  if j is not None]
-    cs = CubicSpline(x, y)
-    
-    return cs(T) / 100
-
-
-def calc_forward(calls, puts, rtr, T):
-    """Calcluating the forward rate of option"""
-    F = calls[0]['strike'] + ((math.e ** (rtr*T)) * (calls[0]['midpoint'] - puts[0]['midpoint']))
-    return F
-
-def calc_T(date, exp_date):
-    """Calcluating the time to expiration in years"""
-    return (datetime.datetime.strptime(exp_date, '%Y-%m-%d') - datetime.datetime.strptime(date, '%Y-%m-%d')).days / 365
-
-def select_options(data):
-    """Select valid options from input data"""
-    calls = filter(lambda x: x['contract_type']=='call', data)
-    puts = filter(lambda x: x['contract_type']=='put', data)
-    
-    calls = filter(out_of_money, calls)
-    puts = filter(out_of_money, puts)
-
-    calls = sorted(calls, key=lambda x: abs(x['strike'] - x['stock_price']))
-    puts = sorted(puts, key=lambda x: abs(x['strike'] - x['stock_price']))
-
-    calls2 = filter_serious(calls)
-    puts2 = filter_serious(puts)
-    
-    return calls2, puts2
-
-def select_options_W_OTM(data):
-    
-    calls = filter(lambda x: x['contract_type']=='call', data)
-    puts = filter(lambda x: x['contract_type']=='put', data)
-
-    calls = sorted(calls, key=lambda x: abs(x['strike'] - x['stock_price']))
-    puts = sorted(puts, key=lambda x: abs(x['strike'] - x['stock_price']))
-
-    calls2 = filter_serious(calls)
-    puts2 = filter_serious(puts)
-    
-    return calls2, puts2
-
-def strike_interval(option1, option2):
-    """Calculates the interval between two strike prices"""
-    return abs(option1['strike'] - option2['strike']) / 2
-
-def calc_intrinsic_price(row):
-    """Calculates the intrinsic price of an option."""
-    
-    pass
-
-def calc_inv_contribution(option, strike_int, rfr, T):
-    return (strike_int / (option['strike']**2))*(math.e**(rfr*T)) * option['midpoint']
-
-def calc_inv_contribution_OTM(option, strike_int, rfr, T):
-    return (strike_int / (option['strike']**2))*(math.e**(rfr*T)) * option['in_price']
-
-def calc_contributions(options, option_first, T, rfr):
-    ls = []
-
-    first_cont = calc_inv_contribution(options[0], strike_interval(option_first, options[1]), rfr, T)
-    # first_contribution = strike_interval(option_first, options[1]) / (options[0]['strike']**2) * math.e**(rfr*T)*options[0] - constraint
-    ls.append(first_cont)
-
-    for i in range(1, len(options)-1):
-        ls.append(calc_inv_contribution(options[i], strike_interval(options[i-1], options[i+1]), rfr, T))
-    
-    return ls
-
-def calc_all_contributions(calls, puts, T, rfr, F):
+def calc_all_contributions(calls, puts, T, rfr, F, cont_func=calc_contributions):
     """Calculating the individual contribution of each option returning a list"""
     ls = []
     Call_first = calls[0]
     Puts_first = puts[0]
-    K_zero = calls[0]['strike']
-    constraint = (1/T)*((F/K_zero - 1) ** 2)
+    # K_zero = calls[0]['strike']
+    # constraint = (1/T)*((F/K_zero - 1) ** 2)
 
-    ls.extend(calc_contributions(calls, Puts_first, T, rfr))
-    ls.extend(calc_contributions(puts, Call_first, T, rfr))
+    ls.extend(cont_func(calls, Puts_first, T, rfr))
+    ls.extend(cont_func(puts, Call_first, T, rfr))
 
-    all_contributions = sum(ls)
-    variance = (2/T) * all_contributions - constraint 
+    # all_contributions = sum(ls)
+    # variance = (2/T) * all_contributions - constraint 
     
+    # return variance
+
+    return ls
+
+
+def transform_to_variance(contributions, K_zero, T, rfr, F):
+    
+    constraint = (1/T)*((F/K_zero - 1) ** 2)
+    
+    all_contributions = sum(contributions)
+    variance = (2/T) * all_contributions - constraint
     return variance
 
+def select_options(data, moneyness=out_of_money):
+    
+    calls = filter(lambda x: x['contract_type']=='call', data)
+    puts = filter(lambda x: x['contract_type']=='put', data)
+    
+    calls = filter(moneyness, calls)
+    puts = filter(moneyness, puts)
+    
+    calls = sorted(calls, key=lambda x: abs(x['strike'] - x['stock_price']))
+    puts = sorted(puts, key=lambda x: abs(x['strike'] - x['stock_price']))
+    
+    calls2 = filter_serious(calls)
+    puts2 = filter_serious(puts)
+    
+    return calls2, puts2
 
 def main(DT):
-    # print(f'calculating VIX for {DT}')
+    
     data = query_date(DT)
     
     if len(data) == 0:
@@ -213,8 +72,13 @@ def main(DT):
     contributions_ls = []
     key_vars = []
     for exp_dt, opt_dat in g:
-        # print(exp_dt)
-        calls, puts = select_options_W_OTM(list(opt_dat))
+        options_data = list(opt_dat)
+        calls, puts = select_options(options_data, moneyness=out_of_money)
+        calls_in, puts_in = select_options(options_data, moneyness=in_the_money)
+
+        calls_in = calc_uncertain_all(calls_in)
+        puts_in = calc_uncertain_all(puts_in)
+        
         T = calc_T(DT, exp_dt)
         
         rfr = get_rfr(DT, T)
@@ -223,15 +87,22 @@ def main(DT):
         
         F = calc_forward(calls, puts, rfr, T)
         
+        K_zero = calls[0]['strike']
+        
         key_vars.append({'T': T, 'rfr': rfr, 'F':F, 'N': (T*525600)})
-        contributions_ls.append(calc_all_contributions(calls, puts, T, rfr, F))
-
+        out_contributions = calc_all_contributions(calls, puts, T, rfr, F)
+        in_contributions = calc_all_contributions(calls_in, puts_in, T, rfr, F, cont_func=calc_contributions_itm)
+        # in_contributions = []
+        print(sum(in_contributions), sum(out_contributions))
+        variance_all = transform_to_variance(out_contributions+in_contributions, K_zero, T, rfr, F)
+        
+        contributions_ls.append(variance_all)
+        
     time_diff1 = (abs(key_vars[1]['N'] - 43200)/(key_vars[1]['N'] - key_vars[0]['N']))
     time_diff2 = (abs(key_vars[0]['N'] - 43200)/(key_vars[1]['N'] - key_vars[0]['N']))
     
     VIX = 100 * math.sqrt( ((key_vars[0]['T'] * contributions_ls[0] * time_diff1) + (key_vars[1]['T'] * contributions_ls[1]*time_diff2)) * (525600/43200) )
     return VIX
-    
     
 if __name__ == '__main__':
     DT = '2023-03-17'
@@ -242,5 +113,3 @@ if __name__ == '__main__':
     VIX = main(DT)
     print(VIX)
     print(f'Finished in {time.time() - starttime} seconds')
-
-
