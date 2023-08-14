@@ -14,7 +14,6 @@ f_format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message
 f_handler.setFormatter(f_format)
 LOG.addHandler(f_handler)
 LOG.setLevel(logging.NOTSET)
-# LOG.
 
 conn = sqlite3.connect("options_database.db")
 
