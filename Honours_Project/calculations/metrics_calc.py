@@ -88,14 +88,15 @@ def observe_vix_acc(DT, vix_method: volatility_methods):
     return (data, VIX)
 
 def sample_random_dates(n: int):
-    """This function will return a list of n random dates between 2007 and 2019"""
+    """This function will return a list of n random dates between 2015 and 2022"""
     start = "2015-01-09"
-    # startdt = 
-    # end = "2023-06-16"
-    random_dates = []
+    startdt = datetime.strptime(start, '%Y-%m-%d')
+    total_dates = 390
+    
+    print()
 
-    for i in range(n):
-        random_dates.append(start + timedelta(days=random.randrange(delta.days)))
+    random_dates = [(startdt + timedelta(weeks=random.randint(0,total_dates))).strftime('%Y-%m-%d') for _ in range(n)]
+
     return random_dates
 
 
