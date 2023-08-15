@@ -65,36 +65,37 @@ class volatility_methods:
         cursor = conn.cursor()
         
         query = f"""
-        with temptable as (
-        SELECT
-            symbol,
-            Contract_Type,
-            Strike,
-            Bid,
-            Midpoint,
-            Ask,
-            Obs_Date,
-            Exp_Date
-        FROM contract_data
-        WHERE 
-            contract_data.symbol ='SPY'
-            and obs_date = '{dt}')
-        select 
-            temptable.symbol,
-            temptable.Contract_Type,
-            temptable.Strike,
-            temptable.bid,
-            temptable.Midpoint,
-            temptable.ask,
-            temptable.Obs_Date,
-            temptable.Exp_Date,
-            price_data.close as stock_price
-        from temptable
-        join price_data
-            on (price_data.Symbol = temptable.Symbol) and (price_data.date_of_close = temptable.Obs_Date)
-            where
-                (Exp_Date = (select min(Exp_Date) from temptable)) or Exp_Date = (select max(Exp_Date) from temptable)
-        ;
+            with temptable as (
+            SELECT
+                symbol,
+                Contract_Type,
+                Strike,
+                Bid,
+                Midpoint,
+                Ask,
+                Obs_Date,
+                Exp_Date
+            FROM contract_data
+            WHERE 
+                contract_data.symbol ='SPY'
+                and obs_date = '{dt}')
+            select 
+                temptable.symbol,
+                temptable.Contract_Type,
+                temptable.Strike,
+                temptable.bid,
+                temptable.Midpoint,
+                temptable.ask,
+                temptable.Obs_Date,
+                temptable.Exp_Date,
+                price_data.close as stock_price
+            from temptable
+            join price_data
+                on (price_data.Symbol = temptable.Symbol) and (price_data.date_of_close = temptable.Obs_Date)
+                where
+                    ((Exp_Date = (select min(Exp_Date) from temptable)) or Exp_Date = (select max(Exp_Date) from temptable))
+                    and (select COUNT( DISTINCT Exp_Date) from temptable) > 1
+            ;
         """
         cursor.execute(query)
         data = cursor.fetchall()
