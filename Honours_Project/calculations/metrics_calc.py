@@ -87,17 +87,43 @@ def observe_vix_acc(DT, vix_method: volatility_methods):
     data['change_ytd'] = abs(data.close / start_close - 1) * 100
     return (data, VIX)
 
-def sample_random_dates(n: int):
+def sample_random_dates(n: int, seed: int =101):
     """This function will return a list of n random dates between 2015 and 2022"""
     start = "2015-01-09"
     startdt = datetime.strptime(start, '%Y-%m-%d')
     total_dates = 390
-    
-    print()
-
+    random.seed(seed)
     random_dates = [(startdt + timedelta(weeks=random.randint(0,total_dates))).strftime('%Y-%m-%d') for _ in range(n)]
 
     return random_dates
+
+
+
+def run_aggs(vix_method, startdt='2021-01-08', num_weeks=52, userandom=False, seed=101):
+
+    startdate = datetime.strptime(startdt, '%Y-%m-%d').date()
+    
+    all_data = {}
+    metric_data = []
+    
+    if userandom:
+        series = sample_random_dates(num_weeks, seed=seed)
+    else:
+        series = [(startdate + timedelta(weeks=p)).strftime('%Y-%m-%d') for p in range(num_weeks)]
+        
+    for dt in series:
+        mets = {}
+        mets['date'] = dt
+ 
+        data, vix = observe_vix_acc(DT=dt, vix_method=vix_method)
+        mets['vix'] = vix
+
+        mets.update(aggregate_metrics.agg_metrics(data))
+
+        metric_data.append(mets)
+        all_data[dt] = data
+        
+    return metric_data, all_data
 
 
 class aggregate_metrics:
@@ -110,7 +136,8 @@ class aggregate_metrics:
         yearopen = df.iloc[0].close
         yearclose = df.iloc[-1].close
         vixtotal = df.vix_t.sum()
-        return {"accuracy": accuracy, "stddev":stddev, "auc":auc, "aoc":aoc, "yearopen": yearopen,"yearclose":yearclose, "vixtotal":vixtotal}
+        yearchange = round((yearclose - yearopen) / yearopen * 100, 2)
+        return {"accuracy": accuracy, "stddev":stddev, "auc":auc, "aoc":aoc, "yearopen": yearopen,"yearclose":yearclose, "yearchange":yearchange, "vixtotal":vixtotal}
 
     def curve_areas(mm, verbose=False):
         mm['abc'] = mm.auc + mm.aoc
