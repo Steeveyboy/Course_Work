@@ -99,15 +99,14 @@ class vix_alternative(volatility_methods):
             key_vars.append({'T': T, 'rfr': rfr, 'F':F, 'N': (T*525600)})
             out_contributions = self.calc_all_contributions(calls, puts, T, rfr, F)
             in_contributions = self.calc_all_contributions(calls_in, puts_in, T, rfr, F)
-            # in_contributions = []
-            # print(sum(in_contributions), sum(out_contributions))
+
             variance_all = self.calc_variances(out_contributions+in_contributions, K_zero, T, rfr, F)
-            # print(variance_all)
+   
             contributions_ls.append(variance_all)
             
         time_diff1 = (abs(key_vars[1]['N'] - 43200)/(key_vars[1]['N'] - key_vars[0]['N']))
         time_diff2 = (abs(key_vars[0]['N'] - 43200)/(key_vars[1]['N'] - key_vars[0]['N']))
-        # print(time_diff1, time_diff2)
+
         VIX = 100 * math.sqrt( ((key_vars[0]['T'] * contributions_ls[0] * time_diff1) + (key_vars[1]['T'] * contributions_ls[1]*time_diff2)) * (525600/43200) )
         return VIX
 

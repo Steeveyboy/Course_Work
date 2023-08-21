@@ -2,7 +2,6 @@ import sqlite3
 import math, datetime, sys, time
 from itertools import groupby
 from scipy.interpolate import CubicSpline
-# import vix_calc_functions
 
 
 class volatility_methods:

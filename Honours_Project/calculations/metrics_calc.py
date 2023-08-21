@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from vix_calc_functions import volatility_methods
 import vix_calc_class as vix_calc
 import sqlite3, math, random
+from sklearn.metrics import mean_absolute_percentage_error, mean_squared_error
 
 def calc_accuracy(df, real_col='change_ytd', vix_t='vix_t') -> (int, int):
     """"""
@@ -81,7 +82,7 @@ def observe_vix_acc(DT, vix_method: volatility_methods):
     start_close = data.iloc[0].close
     
     data['vix_t'] = data.annual_.apply(lambda x: get_period_volatility(VIX, x))
-    
+
     data['price_up'] = (data.vix_t / 100 + 1) * start_close
     data['price_down'] = (-data.vix_t / 100 + 1) * start_close
     data['change_ytd'] = abs(data.close / start_close - 1) * 100
@@ -137,7 +138,10 @@ class aggregate_metrics:
         yearclose = df.iloc[-1].close
         vixtotal = df.vix_t.sum()
         yearchange = round((yearclose - yearopen) / yearopen * 100, 2)
-        return {"accuracy": accuracy, "stddev":stddev, "auc":auc, "aoc":aoc, "yearopen": yearopen,"yearclose":yearclose, "yearchange":yearchange, "vixtotal":vixtotal}
+        RMSE = round(mean_squared_error(df.change_ytd/100, df.vix_t/100, squared=False) * 100, 2)
+        MAPE = round(mean_absolute_percentage_error(df.change_ytd, df.vix_t), 2)
+        
+        return {"accuracy": accuracy, "stddev":stddev, "auc":auc, "aoc":aoc, "yearopen": yearopen,"yearclose":yearclose, "yearchange":yearchange, "vixtotal":vixtotal, "RMSE":RMSE, "MAPE":MAPE}
 
     def curve_areas(mm, verbose=False):
         mm['abc'] = mm.auc + mm.aoc

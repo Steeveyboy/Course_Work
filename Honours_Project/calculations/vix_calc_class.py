@@ -65,7 +65,7 @@ class vix_calc(volatility_methods):
         
         
         for exp_dt, opt_dat in g:
-                # print(exp_dt)
+
                 calls, puts = self.select_options(list(opt_dat))
                 T = self.calc_T(DT, exp_dt)
                 
