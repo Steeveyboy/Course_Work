@@ -2,11 +2,16 @@ import math, datetime, sys, time
 from itertools import groupby
 from vix_calc_functions import volatility_methods
 
+"""This program can be run using the command line but it is recommending to import the class and use the function calc_volatility."""
 
 class vix_alternative(volatility_methods):
     
-    
+    """_summary_: This class will implement the alternative method for calculating volatility based off options data.
+    The function calc_volatility will return the volatility for a given date.
+    """
+
     def get_intrisic_price(self, data):
+        
         if data['contract_type'] == 'call':
             return data["stock_price"] - data["strike"]
         else:

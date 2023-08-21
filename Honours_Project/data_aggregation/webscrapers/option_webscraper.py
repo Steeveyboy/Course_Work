@@ -2,9 +2,10 @@ from requests_html import HTMLSession
 import sqlite3
 from datetime import date
 
-# Target https://www.barchart.com/stocks/quotes/stock/options
+"""_summary_: This program will fetch historical option data from barchart.com and insert it into the database.
+    This program can be run from the command line or imported into another program and called using the main function.
+"""
 
-# link = """https://www.barchart.com/stocks/quotes/{ticker}/options?expiration={expiration_date}-m&view={frmat}&moneyness={moneyness}"""
 link = """https://www.barchart.com/stocks/quotes/{symbol}/options?expiration={expiry}-w&view=stacked&moneyness=allRows"""
 link2 = """https://www.barchart.com/proxies/core-api/v1/options/get?baseSymbol={symbol}&fields=symbol%2CbaseSymbol%2CstrikePrice%2Cmoneyness%2CbidPrice%2Cmidpoint%2CaskPrice%2ClastPrice%2CpriceChange%2CpercentChange%2Cvolume%2CopenInterest%2CopenInterestChange%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20volumeOpenInterestRatio%2Cvolatility%2CoptionType%2CdaysToExpiration%2CexpirationDate%2CtradeTime%2ChistoricVolatility30d%2CbaseNextEarningsDate%2CsymbolCode%2CsymbolType&groupBy=optionType&expirationDate={expiry}&meta=field.shortName%2Cexpirations%2Cfield.description&orderBy=strikePrice&orderDir=asc&expirationType=weekly&raw=1"""
 
@@ -13,7 +14,6 @@ def main(session, db_conn):
 
     r = session.get(link.format(symbol="AMZN", expiry="2023-06-02"))
 
-    # dateOf = r.html.find("#main-content-column > div > div.page-title.symbol-header-info.ng-scope > div.symbol-price-wrapper > div.pricechangerow.ng-scope > span.symbol-trade-time.ng-binding")
     XSRF = r.cookies.get("XSRF-TOKEN")[:-3]
     headers = {"Cookie": f"laravel_token={session.cookies.get('laravel_token')}", "X-Xsrf-Token":XSRF}
 

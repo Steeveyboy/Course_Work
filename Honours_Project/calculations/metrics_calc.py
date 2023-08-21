@@ -5,6 +5,11 @@ import vix_calc_class as vix_calc
 import sqlite3, math, random
 from sklearn.metrics import mean_absolute_percentage_error, mean_squared_error
 
+"""This file will contain functions that will calculate metrics for the volaility indexes.
+    The intent of this file is to reduce the amount of repeating code in the notebooks.
+    These functions will use pandas dataframes to conduct certain calculations.
+"""
+
 def calc_accuracy(df, real_col='change_ytd', vix_t='vix_t') -> (int, int):
     """"""
     bounded = df[real_col] <=df[vix_t]

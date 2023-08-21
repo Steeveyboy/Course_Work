@@ -1,10 +1,11 @@
 import sqlite3
-import math, datetime, sys, time
-from itertools import groupby
+import math, datetime
 from scipy.interpolate import CubicSpline
 
 
 class volatility_methods:
+    
+    """This class implements common methods used in calculating volatility, and should be inherited by other classes that implement volatility calculations."""
 
     PERIODS = {'1mo': 30/365, '2mo': 60/365, '3mo':91/365, '4mo':121/365, '6mo':182/365, '1yr':1, '2yr':2, '3yr':3, '5yr':5, '7yr':7, '10yr':10, '20yr':20, '30yr':30}
 
@@ -160,60 +161,3 @@ class volatility_methods:
         """Calculates the interval between two strike prices"""
         return abs(option1['strike'] - option2['strike']) / 2
     
-    
-    
-"""********************************************************************************************************************"""
-    
-
-
-    
-    
-
-    
-# def calc_implied_volatility(option, strike_int, rfr, T):
-#     """Calculates the implied volatility for an individual option
-#     Args:
-#         option (Dict): Dictionary representing an option
-#         strike_int (float): The interval between the sourrounding strike prices
-#         rfr (float): The risk free rate
-#         T (float): The time to expiration express in years.
-
-#     Returns:
-#         float: The implied volatility of the option
-#     """
-#     # print(rfr, T, math.e**(rfr*T))
-#     return (strike_int / (option['strike']**2))*(math.e**(rfr*T))*option['midpoint']
-
-# def calc_uncertainty_prices(option, strike_int, rfr, T):
-#     """Calculates the uncertainty price for an individual option
-#     Args:
-#         option (Dict): Dictionary representing an option
-#         strike_int (float): The interval between the sourrounding strike prices
-#         rfr (float): The risk free rate
-#         T (float): The time to expiration express in years.
-
-#     Returns:
-#         float: The uncertainty price of the option
-#     """
-#     return (strike_int / (option['strike']**2))*(math.e**(rfr*T))*option['uncert']
-
-# def calc_contributions_itm(options, option_first, T, rfr):
-#     ls = []
-#     first_cont = calc_uncertainty_prices(options[0], strike_interval(option_first, options[1]), rfr, T)
-    
-#     ls.append(first_cont)
-    
-#     for i in range(1, len(options)-1):
-#         ls.append(calc_uncertainty_prices(options[i], strike_interval(options[i-1], options[i+1]), rfr, T))
-#     return ls
-
-# def calc_contributions(options, option_first, T, rfr):
-#     ls = []
-
-#     first_cont = calc_implied_volatility(options[0], strike_interval(option_first, options[1]), rfr, T)
-#     ls.append(first_cont)
-
-#     for i in range(1, len(options)-1):
-#         ls.append(calc_implied_volatility(options[i], strike_interval(options[i-1], options[i+1]), rfr, T))
-    
-#     return ls

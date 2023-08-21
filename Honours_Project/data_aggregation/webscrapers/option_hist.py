@@ -1,13 +1,14 @@
 from requests_html import HTMLSession
 from datetime import datetime, timedelta
 from time import time
-# from option_webscraper import insertData
 import sqlite3
 import sys
 
+"""_summary_
+    This program will fetch stock price data from the marketdata.app API and insert it into the database.
+"""
 
 conn = sqlite3.connect("options_database.db")
-
 
 START_DATE = datetime.strptime('2020-01-03', '%Y-%m-%d').date()
 NEAR_TERM = 23
@@ -17,6 +18,7 @@ CURR_DATE = datetime.today().date()
 token = open('tokens.txt', 'r').read()
 
 link = "https://api.marketdata.app/v1/options/chain/{ticker}/?token={token}&date={obs_date}&from={from_date}&to={to_date}"
+
 
 def fetch_data(ticker, obs_date, s):
     starttime = time()

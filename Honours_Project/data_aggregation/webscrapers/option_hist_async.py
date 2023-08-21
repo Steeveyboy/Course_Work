@@ -1,13 +1,15 @@
-from requests_html import HTMLSession, AsyncHTMLSession
+from requests_html import AsyncHTMLSession
 from datetime import datetime, timedelta
-# from option_webscraper import insertData
 import asyncio
 import sqlite3, sys
 from time import time
 
+"""_summary_: This program will asyncronously fetch historical options contract data from the marketdata.app API and insert it into the database.
+    To run this program, you must insure tokens.txt contains a valid API token for marketdata.app. 
+    It is recommended you specify a symbol in the command line arguments to fetch data for.
+"""
 
 conn = sqlite3.connect("options_database.db")
-
 
 START_DATE = datetime.strptime('2020-01-03', '%Y-%m-%d').date()
 NEAR_TERM = 23
@@ -20,7 +22,14 @@ link = "https://api.marketdata.app/v1/options/chain/{ticker}/?token={token}&date
 
 
 async def fetch_data(ticker, obs_date, s):
-    ## TODO create request to server for data
+    """This function will request historical options contract data from marketdata, and call its insertion into the database.
+
+    Args:
+        ticker str: Specific ticker to request data for
+        obs_date str: date to request data from
+        s requests_html.AsyncHTMLSession: session to use for requests
+    """
+    
     print(f"fetching data for {obs_date}")
     near_date = obs_date + timedelta(days=NEAR_TERM)
     next_date = obs_date + timedelta(days=NEXT_TERM)
@@ -31,7 +40,8 @@ async def fetch_data(ticker, obs_date, s):
     return
     
 def format_data_tuple(data):
-    ## TODO format data into tuple
+    """This function will format a row of data for insertion into the database.
+    """
     return (data['underlying'], data['side'], data['strike'],
             data['bid'], data['mid'], data['ask'],
             data['last'], data['volume'], data['openInterest'], 
@@ -39,6 +49,8 @@ def format_data_tuple(data):
             datetime.fromtimestamp(data['expiration']).strftime("%Y-%m-%d"))
 
 def insert_all_data(data):
+    """This function will take in a dictionary of options data, format and insert it into the database.
+    """
     cur = conn.cursor()
     data.pop("s")
     pivoted_data = [dict(zip(data.keys(), col)) for col in zip(*data.values())]
@@ -52,18 +64,21 @@ def insert_all_data(data):
     
 
 def insertData(dataTuple, cur):
-    # print(type(dataTuple))
-    # cur = conn.cursor()
+    """This function will insert a formatted datatuple into the database. 
+    
+    Args:
+        dataTuple tuple: formatted tuple
+        cur sqlite3.cursor: cursor to use for insertion 
+    """
     full_statement = f"""
         INSERT INTO Contract_Data(Symbol, Contract_Type, Strike, Bid, Midpoint, Ask, Last, Volume, Open_Int, Obs_Date, Exp_Date)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
     """
     cur.execute(full_statement, dataTuple)
-    # conn.commit()
-    # cur.close()
 
 async def main(ticker):
-    # cur = dbconn.cursor()
+    """This function will asynchronously request data for a given ticker, for each week from the specified start date to the current date.
+    """
     s = AsyncHTMLSession()
     obs_date = START_DATE
     while obs_date < CURR_DATE:
@@ -72,12 +87,12 @@ async def main(ticker):
         obs_date += timedelta(days=7)
         await asyncio.sleep(0.1)
     await task
-        
-    # cur.close()
+
         
 if __name__ == "__main__":
+    """This program will run by default using the ticker AAPL, but can be run with a different ticker by passing it as a command line argument."""
     tick = "AAPL"
-    # conn = sqlite3.connect("options_database.db")
+    
     if len(sys.argv) > 1:
         print(sys.argv)
         tick = sys.argv[1]
