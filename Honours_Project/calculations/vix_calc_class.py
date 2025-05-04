@@ -2,8 +2,11 @@ import math, datetime, sys, time
 from itertools import groupby
 from vix_calc_functions import volatility_methods
 
+"""This program can be run using the command line but it is recommending to import the class and use the function calc_volatility."""
 
 class vix_calc(volatility_methods):
+    """This class will implement the original method for calculating volatility or the VIX based off options data.
+    The function calc_volatility will return the VIX for a given date."""
     def select_options(self, data):
         calls = filter(lambda x: x['contract_type']=='call', data)
         puts = filter(lambda x: x['contract_type']=='put', data)
@@ -65,7 +68,7 @@ class vix_calc(volatility_methods):
         
         
         for exp_dt, opt_dat in g:
-                # print(exp_dt)
+
                 calls, puts = self.select_options(list(opt_dat))
                 T = self.calc_T(DT, exp_dt)
                 

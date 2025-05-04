@@ -2,11 +2,16 @@ import math, datetime, sys, time
 from itertools import groupby
 from vix_calc_functions import volatility_methods
 
+"""This program can be run using the command line but it is recommending to import the class and use the function calc_volatility."""
 
 class vix_alternative(volatility_methods):
     
-    
+    """_summary_: This class will implement the alternative method for calculating volatility based off options data.
+    The function calc_volatility will return the volatility for a given date.
+    """
+
     def get_intrisic_price(self, data):
+        
         if data['contract_type'] == 'call':
             return data["stock_price"] - data["strike"]
         else:
@@ -99,15 +104,14 @@ class vix_alternative(volatility_methods):
             key_vars.append({'T': T, 'rfr': rfr, 'F':F, 'N': (T*525600)})
             out_contributions = self.calc_all_contributions(calls, puts, T, rfr, F)
             in_contributions = self.calc_all_contributions(calls_in, puts_in, T, rfr, F)
-            # in_contributions = []
-            # print(sum(in_contributions), sum(out_contributions))
+
             variance_all = self.calc_variances(out_contributions+in_contributions, K_zero, T, rfr, F)
-            # print(variance_all)
+   
             contributions_ls.append(variance_all)
             
         time_diff1 = (abs(key_vars[1]['N'] - 43200)/(key_vars[1]['N'] - key_vars[0]['N']))
         time_diff2 = (abs(key_vars[0]['N'] - 43200)/(key_vars[1]['N'] - key_vars[0]['N']))
-        # print(time_diff1, time_diff2)
+
         VIX = 100 * math.sqrt( ((key_vars[0]['T'] * contributions_ls[0] * time_diff1) + (key_vars[1]['T'] * contributions_ls[1]*time_diff2)) * (525600/43200) )
         return VIX
 
