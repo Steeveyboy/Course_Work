@@ -1,7 +1,7 @@
-
+**/venv/*
 .ipynb_checkpoints/
 *.pyc
 tokens.txt
 options_database.db
 Honours_Project/data_aggregation/options_database_test.db
-**/venv/
+
