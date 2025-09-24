@@ -17,6 +17,7 @@ explored = StackFrontier()
 frontier = StackFrontier()
 path = StackFrontier()
 
+movie_stack = set()
 
 def load_data(directory):
     """
@@ -88,6 +89,7 @@ def main():
             person2 = people[path[i + 1][1]]["name"]
             movie = movies[path[i + 1][0]]["title"]
             print(f"{i + 1}: {person1} and {person2} starred in {movie}")
+    print("Exiting Main()")
 
 
 def shortest_path(source, target):
@@ -101,8 +103,15 @@ def shortest_path(source, target):
     # Check with people[source].intersection(people.target)
     # print(people.get(source, {}).get("name"), people.get(target, {}).get("name"))
 
+    if source == target:
+        return []
+
     neighbors = neighbors_for_person(source)
 
+    
+    if explored.size() > 30:
+        return None
+        
     explored.add(Node(
         parent=source,
         state=source,
@@ -115,7 +124,7 @@ def shortest_path(source, target):
         #SUCCESS CONDITION
         if person_id == target:
             return [(movie_id, target)]
-
+#  and (not (movie_id in movie_stack))
         if (not explored.contains_state(person_id)):
             scoped_frontier.add(node=Node(
                 state=person_id,
@@ -126,7 +135,7 @@ def shortest_path(source, target):
     best_path = None
     while not scoped_frontier.empty():
         next_node = scoped_frontier.remove()
-
+        # movie_stack.add(next_node.action)
         response = shortest_path(next_node.state, target)
 
         if response:
@@ -135,7 +144,7 @@ def shortest_path(source, target):
                 
             elif (len(response)+1 < len(best_path)):
                 best_path = [(next_node.action, next_node.state)] + response
-
+        # movie_stack.remove(next_node.action)
 
     explored.remove()
     print(source, explored.size())
@@ -189,3 +198,4 @@ def neighbors_for_person(person_id):
 
 if __name__ == "__main__":
     main()
+    print("Done")
