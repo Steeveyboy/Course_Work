@@ -37,11 +37,11 @@ def actions(board):
     """
     Returns set of all possible actions (i, j) available on the board.
     """
-    action_list = []
+    action_list = set()
     for i in range(3):
         for j in range(3):
             if board[i][j] == EMPTY:
-                action_list.append((i, j))
+                action_list.add((i, j))
     return action_list
 
 def validate_action(board, action):
