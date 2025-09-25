@@ -10,6 +10,7 @@ X = "X"
 O = "O"
 EMPTY = None
 
+STATE_COUNT = 0
 
 def initial_state():
     """
@@ -36,17 +37,33 @@ def actions(board):
     """
     Returns set of all possible actions (i, j) available on the board.
     """
+    action_list = []
     for i in range(3):
         for j in range(3):
             if board[i][j] == EMPTY:
-                yield (i, j)
+                action_list.append((i, j))
+    return action_list
 
+def validate_action(board, action):
+    """
+    Validates if an action is valid on the board.
+    """
+    if board[action[0]][action[1]] != EMPTY:
+        return False
+    
+    if action not in actions(board):
+        return False
+    return True
 
 def result(board, action):
     """
     Returns the board that results from making move (i, j) on the board.
     """
-    new_board = deepcopy(board)
+    
+    if not validate_action(board, action):
+        raise Exception("Invalid Move")
+    
+    new_board = deepcopy(board)    
     new_board[action[0]][action[1]] = player(board)
     
     return new_board
@@ -103,32 +120,47 @@ def utility(board):
         return 0
     
 def max_value(board):
+    """
+    This will return the maximum terminal value, for a move.
+    """
     if terminal(board):
         return utility(board)
     
     v = -2
     for action in actions(board):
         v = max(v, min_value(result(board, action)))
+        if v == 1:
+            break
     return v
 
 def min_value(board):
+    """
+    This will return the minimum terminal value, for a move.
+    """
+
     if terminal(board):
         return utility(board)
     
     v = 2
     for action in actions(board):
         v = min(v, max_value(result(board, action)))
+        if v == -1:
+            break
     return v
+
 
 
 def minimax(board):
     """
     Returns the optimal action for the current player on the board.
     """
-    if terminal(board):
-        return utility(board)
-    
     current_player = player(board)
+    
+    if terminal(board):
+        return None
+    
+    if all(cell == EMPTY for row in board for cell in row):
+        return random.choice(list(actions(board)))
     
     if current_player == X:
         best_action = None
@@ -137,7 +169,7 @@ def minimax(board):
             util = min_value(result(board, action))
             if util > best_score:
                 best_action = action
-                best_score = util
+                best_score = util            
         return best_action
 
     else:
