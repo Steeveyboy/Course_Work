@@ -105,27 +105,32 @@ class Sentence():
         """
         Returns the set of all cells in self.cells known to be mines.
         """
-        raise NotImplementedError
+        if len(self.cells) == self.count:
+            return self.cells.copy()
 
     def known_safes(self):
         """
         Returns the set of all cells in self.cells known to be safe.
         """
-        raise NotImplementedError
+        if self.count == 0:
+            return self.cells.copy()
 
     def mark_mine(self, cell):
         """
         Updates internal knowledge representation given the fact that
         a cell is known to be a mine.
         """
-        raise NotImplementedError
+        if cell in self.cells:
+            self.cells.remove(cell)
+            self.count -= 1
 
     def mark_safe(self, cell):
         """
         Updates internal knowledge representation given the fact that
         a cell is known to be safe.
         """
-        raise NotImplementedError
+        if cell in self.cells:
+            self.cells.remove(cell)
 
 
 class MinesweeperAI():
@@ -167,6 +172,22 @@ class MinesweeperAI():
         for sentence in self.knowledge:
             sentence.mark_safe(cell)
 
+    def neighboring_cells(self, cell):
+        """
+        Return a set of all neighboring cells.
+        """
+        neighbors = set()
+        for i in range(-1, 2):
+            for j in range(-1, 2):
+                if (i, j) == (0, 0):
+                    continue
+                
+                neighbor = (cell[0] + i, cell[1] + j)
+                if 0 <= neighbor[0] < self.height and 0 <= neighbor[1] < self.width:
+                    neighbors.add(neighbor)
+                    
+        return neighbors
+
     def add_knowledge(self, cell, count):
         """
         Called when the Minesweeper board tells us, for a given
@@ -182,7 +203,35 @@ class MinesweeperAI():
             5) add any new sentences to the AI's knowledge base
                if they can be inferred from existing knowledge
         """
-        raise NotImplementedError
+        self.moves_made.add(cell)
+        self.safes.add(cell)
+        
+        neighbors = self.neighboring_cells(cell)
+        
+        new_sentence = Sentence(cells=(neighbors - self.moves_made), count=count)
+
+        self.knowledge.append(new_sentence)
+        self.mark_safe(cell)
+        
+        
+        for sentence in self.knowledge:
+            if c_mines := sentence.known_mines():
+                for mine in c_mines:
+                    self.mark_mine(mine)
+        
+        for sentence in self.knowledge:
+            if c_safes := sentence.known_safes():
+                for safe in c_safes:
+                    self.mark_safe(safe)
+        
+        for sentence in self.knowledge:
+            if sentence.cells.issubset(new_sentence.cells):
+                inferred_cells = new_sentence.cells - sentence.cells
+                inferred_count = new_sentence.count - sentence.count
+                if inferred_cells:
+                    inferred_sentence = Sentence(inferred_cells, inferred_count)
+                    if inferred_sentence not in self.knowledge:
+                        self.knowledge.append(inferred_sentence)
 
     def make_safe_move(self):
         """
@@ -193,7 +242,7 @@ class MinesweeperAI():
         This function may use the knowledge in self.mines, self.safes
         and self.moves_made, but should not modify any of those values.
         """
-        raise NotImplementedError
+        return (self.safes - self.moves_made).pop() if (self.safes - self.moves_made) else None
 
     def make_random_move(self):
         """
@@ -202,4 +251,11 @@ class MinesweeperAI():
             1) have not already been chosen, and
             2) are not known to be mines
         """
-        raise NotImplementedError
+        
+        if len(self.moves_made) + len(self.mines) == self.height * self.width:
+            return None
+        
+        random_cell = (random.randint(0, self.height - 1), random.randint(0, self.width - 1))
+        while random_cell in self.moves_made or random_cell in self.mines:
+            random_cell = (random.randint(0, self.height - 1), random.randint(0, self.width - 1))
+        return random_cell
