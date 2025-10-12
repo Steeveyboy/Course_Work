@@ -107,6 +107,7 @@ class Sentence():
         """
         if len(self.cells) == self.count:
             return self.cells.copy()
+        return set()
 
     def known_safes(self):
         """
@@ -114,6 +115,7 @@ class Sentence():
         """
         if self.count == 0:
             return self.cells.copy()
+        return set()
 
     def mark_mine(self, cell):
         """
@@ -208,11 +210,22 @@ class MinesweeperAI():
         
         neighbors = self.neighboring_cells(cell)
         
-        new_sentence = Sentence(cells=(neighbors - self.moves_made), count=count)
+        new_sentence = Sentence(cells=(neighbors - self.moves_made - self.safes), count=count)
+        
+        for m in self.mines:
+            new_sentence.mark_mine(m)
 
         self.knowledge.append(new_sentence)
         self.mark_safe(cell)
         
+        for sentence in self.knowledge:
+            if sentence.cells.issubset(new_sentence.cells):
+                inferred_cells = new_sentence.cells - sentence.cells
+                inferred_count = new_sentence.count - sentence.count
+                if inferred_cells:
+                    inferred_sentence = Sentence(inferred_cells, inferred_count)
+                    if inferred_sentence not in self.knowledge:
+                        self.knowledge.append(inferred_sentence)
         
         for sentence in self.knowledge:
             if c_mines := sentence.known_mines():
@@ -224,14 +237,7 @@ class MinesweeperAI():
                 for safe in c_safes:
                     self.mark_safe(safe)
         
-        for sentence in self.knowledge:
-            if sentence.cells.issubset(new_sentence.cells):
-                inferred_cells = new_sentence.cells - sentence.cells
-                inferred_count = new_sentence.count - sentence.count
-                if inferred_cells:
-                    inferred_sentence = Sentence(inferred_cells, inferred_count)
-                    if inferred_sentence not in self.knowledge:
-                        self.knowledge.append(inferred_sentence)
+
 
     def make_safe_move(self):
         """
