@@ -48,8 +48,8 @@ knowledge3 = And(
     Not(Biconditional(BKnight, BKnave)),
     Not(Biconditional(CKnight, CKnave)),
     Implication(CKnight, AKnight),
-    Implication(BKnave, CKnight),
-    BKnave
+    Not(Biconditional(BKnight, CKnight)),
+    Implication(Or(AKnight, AKnave), BKnave)
 )
 
 
@@ -70,7 +70,7 @@ def main():
             for symbol in symbols:
                 # print("Checking symbol", symbol)
                 if model_check(knowledge, symbol):
-                    print(f" -   {symbol}")
+                    print(f"   {symbol}")
 
 
 if __name__ == "__main__":
