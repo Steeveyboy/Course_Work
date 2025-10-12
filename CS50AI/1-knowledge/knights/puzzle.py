@@ -30,7 +30,12 @@ knowledge1 = And(
 # A says "We are the same kind."
 # B says "We are of different kinds."
 knowledge2 = And(
-    # TODO
+    Not(Biconditional(AKnight, AKnave)),
+    Not(Biconditional(BKnight, BKnave)),
+    Implication(AKnight, Biconditional(AKnight, BKnight)),
+    Implication(AKnave, Not(Biconditional(AKnight, BKnight))),
+    Implication(BKnight, And(AKnave, BKnight)),
+    # Implication(BKnave, AKnave)
 )
 
 # Puzzle 3
@@ -39,7 +44,12 @@ knowledge2 = And(
 # B says "C is a knave."
 # C says "A is a knight."
 knowledge3 = And(
-    # TODO
+    Not(Biconditional(AKnight, AKnave)),
+    Not(Biconditional(BKnight, BKnave)),
+    Not(Biconditional(CKnight, CKnave)),
+    Implication(CKnight, AKnight),
+    Implication(BKnave, CKnight),
+    BKnave
 )
 
 
@@ -52,12 +62,12 @@ def main():
         ("Puzzle 3", knowledge3)
     ]
 
-    for puzzle, knowledge in puzzles[1:]:
+    for puzzle, knowledge in puzzles:
         print(puzzle)
         if len(knowledge.conjuncts) == 0:
             print("    Not yet implemented.")
         else:
-            for symbol in symbols[:4]:
+            for symbol in symbols:
                 # print("Checking symbol", symbol)
                 if model_check(knowledge, symbol):
                     print(f" -   {symbol}")
