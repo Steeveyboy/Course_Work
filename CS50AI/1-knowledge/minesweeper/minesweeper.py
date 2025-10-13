@@ -2,6 +2,7 @@ import itertools
 import random
 
 
+
 class Minesweeper():
     """
     Minesweeper game representation
@@ -21,7 +22,8 @@ class Minesweeper():
             for j in range(self.width):
                 row.append(False)
             self.board.append(row)
-
+        
+        # random.seed(101) # For debugging
         # Add mines randomly
         while len(self.mines) != mines:
             i = random.randrange(height)
@@ -189,6 +191,44 @@ class MinesweeperAI():
                     neighbors.add(neighbor)
                     
         return neighbors
+    
+    def refresh_knowledge(self):
+        """
+        Relabels known mines and safes.
+        """
+        for sentence in self.knowledge:
+            if c_mines := sentence.known_mines():
+                for mine in c_mines:
+                    self.mark_mine(mine)
+            if c_safes := sentence.known_safes():
+                for safe in c_safes:
+                    self.mark_safe(safe)
+
+    def infer_knowledge(self):
+        """
+        Iterates over all pairs of possible sentences.
+        """
+        inferred_senteces = []
+        for sentence1, sentence2 in itertools.combinations(self.knowledge, 2):
+            if sentence1.cells.issubset(sentence2.cells) and len(sentence1.cells) > 0:
+                inferred_cells = sentence2.cells - sentence1.cells
+                inferred_count = sentence2.count - sentence1.count
+                if inferred_cells:
+                    inferred_sentence = Sentence(inferred_cells, inferred_count)
+                    if inferred_sentence not in self.knowledge:
+                        inferred_senteces.append(inferred_sentence)
+                        
+            elif sentence2.cells.issubset(sentence1.cells) and len(sentence2.cells) > 0:
+                inferred_cells = sentence1.cells - sentence2.cells
+                inferred_count = sentence1.count - sentence2.count
+                
+                if inferred_cells:
+                    inferred_sentence = Sentence(inferred_cells, inferred_count)
+                    if inferred_sentence not in self.knowledge:
+                        inferred_senteces.append(inferred_sentence)
+        
+                        
+        self.knowledge.extend(inferred_senteces)
 
     def add_knowledge(self, cell, count):
         """
@@ -206,38 +246,27 @@ class MinesweeperAI():
                if they can be inferred from existing knowledge
         """
         self.moves_made.add(cell)
-        self.safes.add(cell)
+        self.mark_safe(cell)
         
         neighbors = self.neighboring_cells(cell)
-        
         new_sentence = Sentence(cells=(neighbors - self.moves_made - self.safes), count=count)
+        self.knowledge.append(new_sentence)
         
         for m in self.mines:
             new_sentence.mark_mine(m)
-
-        self.knowledge.append(new_sentence)
-        self.mark_safe(cell)
+            
+        self.refresh_knowledge()        
         
-        for sentence in self.knowledge:
-            if sentence.cells.issubset(new_sentence.cells):
-                inferred_cells = new_sentence.cells - sentence.cells
-                inferred_count = new_sentence.count - sentence.count
-                if inferred_cells:
-                    inferred_sentence = Sentence(inferred_cells, inferred_count)
-                    if inferred_sentence not in self.knowledge:
-                        self.knowledge.append(inferred_sentence)
+        self.infer_knowledge()
         
-        for sentence in self.knowledge:
-            if c_mines := sentence.known_mines():
-                for mine in c_mines:
-                    self.mark_mine(mine)
+        self.refresh_knowledge()
         
-        for sentence in self.knowledge:
-            if c_safes := sentence.known_safes():
-                for safe in c_safes:
-                    self.mark_safe(safe)
+        self.infer_knowledge()
         
-
+        self.refresh_knowledge()
+        
+        print("known Safe Moves", len(self.safes-self.moves_made))
+        
 
     def make_safe_move(self):
         """
