@@ -6,7 +6,7 @@ from minesweeper import Minesweeper, MinesweeperAI
 
 HEIGHT = 8
 WIDTH = 8
-MINES = 8
+MINES = 7
 
 # Colors
 BLACK = (0, 0, 0)
@@ -15,7 +15,7 @@ WHITE = (255, 255, 255)
 
 # Create game
 pygame.init()
-size = width, height = 600, 400
+size = width, height = 900, 600
 screen = pygame.display.set_mode(size)
 
 # Fonts
@@ -93,7 +93,7 @@ while True:
             mouse = pygame.mouse.get_pos()
             if buttonRect.collidepoint(mouse):
                 instructions = False
-                time.sleep(0.3)
+                time.sleep(0.2)
 
         pygame.display.flip()
         continue
@@ -173,7 +173,7 @@ while True:
                         flags.remove((i, j))
                     else:
                         flags.add((i, j))
-                    time.sleep(0.2)
+                    time.sleep(0.1)
 
     elif left == 1:
         mouse = pygame.mouse.get_pos()
@@ -190,7 +190,7 @@ while True:
                     print("No known safe moves, AI making random move.")
             else:
                 print("AI making safe move.")
-            time.sleep(0.2)
+            time.sleep(0.08)
 
         # Reset game state
         elif resetButton.collidepoint(mouse):
